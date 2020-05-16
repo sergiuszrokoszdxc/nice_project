@@ -11,6 +11,13 @@ This is a training ground for some new ideas.
     5. push
   2. Implement CD and Docker
     1. Watch tutorial
+    2. Tests
+      1. Unit
+      2. Integration
+      3. Spec-style report
+      4. Coverage
+    3. Create settings for each scenario test/build/release/production
+    4. Acceptance project
   3. write a simple feature
     1. create new branch
     2. extend tests
