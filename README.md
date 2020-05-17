@@ -18,6 +18,7 @@ This is a training ground for some new ideas.
       4. Coverage
     3. Create settings for each scenario test/build/release/production
     4. Acceptance project
+    5. Caching pip files
   3. write a simple feature
     1. create new branch
     2. extend tests
