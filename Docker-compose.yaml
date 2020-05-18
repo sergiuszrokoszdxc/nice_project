@@ -1,0 +1,11 @@
+# TODO: add test variables
+# TODO: add debugging variables
+# TODO: later should be doing acceptance tests against
+version: '3'
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+  acceptance_tests:
+    image: "redis:alpine"

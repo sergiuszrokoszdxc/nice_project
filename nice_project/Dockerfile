@@ -12,12 +12,8 @@ RUN mkdir /wheel
 
 COPY . .
 
-RUN python3 -m pip wheel --wheel-dir=/wheel -r requirements.txt \
-  && python3 -m pip install --no-index --find-links=/wheel -r requirements.txt
-
-RUN python3 -m pip wheel --wheel-dir=/wheel --no-index --find-links=/wheel .
-
-RUN python3 -m pip install -r requirements_dev.txt
+RUN python3 -m pip wheel --wheel-dir=/wheel . \
+  && python3 -m pip install --no-index --find-links=/wheel .
 
 ENTRYPOINT [ "/bin/sh", "entrypoint.sh" ]
 
@@ -29,11 +25,9 @@ RUN python3 -m pip install --upgrade pip \
 RUN mkdir /wheel
 
 COPY --from=build /wheel /wheel
-# add statics folder
+
 RUN pip install --no-index --find-links=/wheel /wheel/*.whl
 
-COPY entrypoint.sh entrypoint.sh
-
-ENV FLASK_APP=nice_project.app:flask_app
-ENV FLASK_RUN_HOST=0.0.0.0
-ENV FLASK_RUN_PORT=5000
+# TODO: add pip cache
+# TODO: docker-compose.yaml
+# TODO: nginx server
