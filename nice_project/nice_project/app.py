@@ -6,7 +6,7 @@ from flask import render_template
 from nice_project.utils.memory import Memory
 from nice_project.utils.stoper import Stoper
 
-flask_app = Flask(__name__)
+flask_app = Flask(__name__, static_folder="../nginx/static")
 
 memory = Memory(8)
 
