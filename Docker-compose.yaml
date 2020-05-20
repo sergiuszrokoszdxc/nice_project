@@ -1,0 +1,45 @@
+version: "3.8"
+services:
+
+  nice_project:
+    build: ./nice_project
+    command:
+      - uwsgi
+      - --module nice_project.app:flask_app
+      - --socket 0.0.0.0:${NICE_PROJECT_PORT}
+      - --master
+      - --processes 1
+      - --threads 1
+      - --die-on-term
+    networks:
+      - network
+
+  nginx:
+    build: 
+      context: ./nginx
+      args:
+        - NICE_PROJECT_HOST=nice_project
+        - NICE_PROJECT_PORT=${NICE_PROJECT_PORT}
+        - NGINX_LISTEN_PORT=${NGINX_LISTEN_PORT}
+    depends_on:
+      - nice_project
+    expose:
+      - ${NGINX_LISTEN_PORT}
+    ports:
+      - ${SERVICE_PORT}:${NGINX_LISTEN_PORT}
+    networks:
+      - network
+
+  acceptance_tests:
+    build: ./acceptance_tests
+    depends_on:
+      - nginx
+    environment: 
+      NGINX_HOST: nginx
+      NGINX_PORT: "${NGINX_LISTEN_PORT}"
+    networks:
+      - network
+
+networks:
+  network:
+    driver: bridge
