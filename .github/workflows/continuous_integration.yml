@@ -18,3 +18,5 @@ jobs:
         - name: Checkout
           uses: actions/checkout@v2
         - uses: actions/setup-python@v2
+        - name: Fail
+          run: exit 11
