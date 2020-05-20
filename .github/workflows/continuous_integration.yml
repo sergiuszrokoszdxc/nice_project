@@ -12,14 +12,16 @@ on:
       - master
 
 jobs:
-  unit_and_integration_test:
+  Tests:
     runs-on: ubuntu-latest
     steps:
         - name: Checkout
           uses: actions/checkout@v2
-        - name: List directories once more
-          run: ls
-        - name: Testy
+        - name: Unit and integration tests of nice_project
+          run: |
+            docker build --tag nice_project_tests --target build  nice_project
+            docker run nice_project_tests python -m unittest
+        - name: Acceptance tests
           run: docker-compose up
           env:
             NGINX_LISTEN_PORT: 5002
