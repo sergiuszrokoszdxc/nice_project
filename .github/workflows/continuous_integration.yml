@@ -17,6 +17,8 @@ jobs:
     steps:
         - name: Checkout
           uses: actions/checkout@v2
+          # get tests log out
+          # get flask out of requirements
         - name: Unit and integration tests of nice_project
           run: |
             docker build --tag nice_project_tests --target build  nice_project
