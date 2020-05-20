@@ -17,5 +17,7 @@ jobs:
     steps:
         - name: Checkout
           uses: actions/checkout@v2
+        - name: List directories
+          run: ls
         - name: Testy
           run: docker-compose up
