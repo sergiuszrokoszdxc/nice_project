@@ -36,4 +36,3 @@ RUN sed -i 's/\r$//' entrypoint.sh
 
 ENTRYPOINT [ "./entrypoint.sh" ]
 # TODO: add pip cache
-# TODO: MANIFEST.ini
