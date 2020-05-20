@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
         - name: Checkout
-        uses: actions/checkout@v2
-        #id:
+          uses: actions/checkout@v2
+          #id:
         - name: SMTH
-        run: echo "KOCHAM ANIE"
+          run: echo "KOCHAM ANIE"
