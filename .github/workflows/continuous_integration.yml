@@ -19,9 +19,9 @@ jobs:
           uses: actions/checkout@v2
           # get tests log out
         - name: Unit and integration tests of nice_project
-          run: |
-            docker build --tag nice_project_tests --target build  nice_project
-            docker run nice_project_tests python -m unittest
+          run: docker build --tag nice_project_tests --target build  nice_project
+        - name: EXEC
+          run: docker run nice_project_tests python -m unittest
         - name: Acceptance tests
           run: docker-compose up
           env:
