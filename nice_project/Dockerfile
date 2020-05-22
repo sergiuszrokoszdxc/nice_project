@@ -14,7 +14,11 @@ RUN python3 -m pip install --upgrade pip \
 
 RUN mkdir /wheel
 
-COPY . .
+COPY . /nice_project
+
+WORKDIR /nice_project
+
+RUN python3 -m pip install -r requirements.txt
 
 RUN python3 -m pip wheel --wheel-dir=/wheel . \
   && python3 -m pip install --no-index --find-links=/wheel .
@@ -33,6 +37,8 @@ RUN python3 -m pip install --no-index --find-links=/wheel /wheel/*.whl
 COPY entrypoint.sh entrypoint.sh
 
 RUN sed -i 's/\r$//' entrypoint.sh
+
+RUN chmod +x entrypoint.sh
 
 ENTRYPOINT [ "./entrypoint.sh" ]
 # TODO: add pip cache

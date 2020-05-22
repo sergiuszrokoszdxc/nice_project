@@ -1,0 +1,29 @@
+#- dockercompose - build
+#- publish obrazu
+
+name: Continuous Deployment
+
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+        - name: Build release image
+          run: docker build --tag nice_project nice_project
+        - name: Tagging realease image
+        # jeśli byłoby więcej obrazów to można zastosować matrix + zmienne?
+          run: >
+            docker tag nice_project 
+            ${{ secrets.DOCKERHUB_ACCOUNT_NAME }}/nice_project_nice_project:latest
+          # inne tagi
+        - name: Loging into dockerhub
+          run: docker login -u ${{ DOCKERHUB_ACCOUNT_NAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+        - name: Pushing image
+          run: |
+            docker push ${{ DOCKERHUB_ACCOUNT_NAME }}/nice_project_nice_project:latest
+          # inne tagi
+        - name: Logint out of dockerhub
+          run: docker logout
