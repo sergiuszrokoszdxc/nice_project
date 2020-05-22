@@ -20,7 +20,7 @@ jobs:
           # get tests log out
         - name: Unit and integration tests of nice_project
           run: docker build --tag nice_project_tests --target build  nice_project
-        - name: EXEC
+        - name: EXECc
           run: docker run nice_project_tests python -m unittest
         - name: Acceptance tests
           run: docker-compose up
