@@ -14,7 +14,9 @@ RUN python3 -m pip install --upgrade pip \
 
 RUN mkdir /wheel
 
-COPY . .
+COPY . /nice_project
+
+WORKDIR /nice_project
 
 RUN python3 -m pip install -r requirements.txt
 
