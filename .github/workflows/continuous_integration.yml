@@ -24,11 +24,11 @@ jobs:
           run: docker run nice_project_tests python -m unittest
         - name: Building release image
           run: docker-compose up nginx
-        - name: Acceptance tests
-          run: |
-            docker-compose up
-            docker-compose down
           env:
             NGINX_LISTEN_PORT: 5002
             NICE_PROJECT_PORT: 5001
             SERVICE_PORT: 5000
+        - name: Acceptance tests
+          run: |
+            docker-compose up
+            docker-compose down
