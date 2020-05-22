@@ -11,6 +11,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+        - name: Checkout
+          uses: actions/checkout@v2
         - name: Build release image
           run: docker build --tag nice_project nice_project
         - name: Tagging realease image
