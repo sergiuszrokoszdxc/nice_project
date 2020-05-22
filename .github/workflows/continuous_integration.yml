@@ -17,13 +17,19 @@ jobs:
     steps:
         - name: Checkout
           uses: actions/checkout@v2
-          # get tests log out
+          # get tests log out#
+        - name: Installing dependencies for test and build phases
+          run: docker build --tag nice_project_tests --target build nice_project
         - name: Unit and integration tests of nice_project
-          run: docker build --tag nice_project_tests --target build  nice_project
-        - name: EXEC
           run: docker run nice_project_tests python -m unittest
+        - name: Deploying Application
+          run: |
+            docker-compose build
+            docker-compose up nginx
         - name: Acceptance tests
-          run: docker-compose up
+          run: |
+            docker-compose up test
+            docker-compose down
           env:
             NGINX_LISTEN_PORT: 5002
             NICE_PROJECT_PORT: 5001
