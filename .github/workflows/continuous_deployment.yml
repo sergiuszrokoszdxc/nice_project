@@ -20,10 +20,13 @@ jobs:
             ${{ secrets.DOCKERHUB_ACCOUNT_NAME }}/nice_project_nice_project:latest
           # inne tagi
         - name: Loging into dockerhub
-          run: docker login -u ${{ DOCKERHUB_ACCOUNT_NAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+          run: 
+            docker login
+            -u ${{ secrets.DOCKERHUB_ACCOUNT_NAME }}
+            -p ${{ secrets.DOCKERHUB_PASSWORD }}
         - name: Pushing image
           run: |
-            docker push ${{ DOCKERHUB_ACCOUNT_NAME }}/nice_project_nice_project:latest
+            docker push ${{ secrets.DOCKERHUB_ACCOUNT_NAME }}/nice_project_nice_project:latest
           # inne tagi
         - name: Logint out of dockerhub
           run: docker logout
