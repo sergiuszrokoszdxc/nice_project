@@ -20,8 +20,7 @@ WORKDIR /nice_project
 
 RUN python3 -m pip install -r requirements.txt
 
-RUN python3 -m pip wheel --wheel-dir=/wheel . \
-  && python3 -m pip install --no-index --find-links=/wheel .
+RUN python3 -m pip install .
 
 FROM python:3.8.3-alpine3.11 as application
 
