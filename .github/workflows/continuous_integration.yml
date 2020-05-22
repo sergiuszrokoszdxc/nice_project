@@ -23,7 +23,7 @@ jobs:
         - name: Unit and integration tests of nice_project
           run: docker run nice_project_tests python -m unittest
         - name: Building release image
-          run: docker-compose up nginx
+          run: docker-compose up nginx -d
           env:
             NGINX_LISTEN_PORT: 5002
             NICE_PROJECT_PORT: 5001
