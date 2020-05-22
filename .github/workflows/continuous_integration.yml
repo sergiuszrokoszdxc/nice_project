@@ -32,7 +32,7 @@ jobs:
             SERVICE_PORT: 5000
         - name: Acceptance tests
           run: |
-            docker-compose up test
+            docker-compose up acceptance_tests
             docker-compose down
           env:
             NGINX_LISTEN_PORT: 5002
