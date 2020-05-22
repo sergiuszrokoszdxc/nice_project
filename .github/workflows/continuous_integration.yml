@@ -32,3 +32,5 @@ jobs:
           run: |
             docker-compose up
             docker-compose down
+          env:
+            NGINX_LISTEN_PORT: 5002
