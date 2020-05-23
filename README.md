@@ -1,4 +1,7 @@
 # nice_project
+
+![Continuous Integration](https://github.com/sergiuszrokoszdxc/nice_project/workflows/Continuous%20Integration/badge.svg)
+
 This is a training ground for some new ideas.
 
 ## plan of action
