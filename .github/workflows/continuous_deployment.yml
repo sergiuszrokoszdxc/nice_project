@@ -26,9 +26,10 @@ jobs:
           docker tag nice_project "$DOCKER_USER"/nice_project_nice_project:"$SHORT_SHA"
       - name: Tagging image with a release tag
         if: ${{ github.event_name == 'release' }}
-        TAG="${GITHUB_REF##*/}"
-        echo '::set-env name=TAG::'"$TAG"
-        run: docker tag nice_project "$DOCKER_USER"/nice_project_nice_project:"$TAG"
+        run: |
+          TAG="${GITHUB_REF##*/}"
+          echo '::set-env name=TAG::'"$TAG"
+          docker tag nice_project "$DOCKER_USER"/nice_project_nice_project:"$TAG"
       - name: Loging into dockerhub
         run: 
           echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
