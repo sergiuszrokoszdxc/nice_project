@@ -24,8 +24,8 @@ jobs:
         - name: Loging into dockerhub
           run: 
             docker login
-            -u ${{ secrets.DOCKERHUB_ACCOUNT_NAME }}
-            -p ${{ secrets.DOCKERHUB_PASSWORD }}
+            -u "${{ secrets.DOCKERHUB_ACCOUNT_NAME }}"
+            -p "${{ secrets.DOCKERHUB_PASSWORD }}"
         - name: Pushing image
           run: |
             docker push ${{ secrets.DOCKERHUB_ACCOUNT_NAME }}/nice_project_nice_project:latest
