@@ -29,7 +29,7 @@ jobs:
         run: docker tag nice_project "$DOCKER_USER"/nice_project_nice_project:"$GITHUB_REF"
       - name: Loging into dockerhub
         run: 
-          echo "::add-mask::$DOCKER_PASSWORD" | docker login -u\""$DOCKER_USER"\" --password-stdin
+          echo "$DOCKER_PASSWORD" | docker login -u\""$DOCKER_USER"\" --password-stdin
       - name: Pushing images
         run: |
           docker push "$DOCKER_USER"/nice_project_nice_project:latest
