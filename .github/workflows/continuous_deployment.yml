@@ -21,6 +21,7 @@ jobs:
       # jeśli byłoby więcej obrazów to można zastosować matrix + zmienne?
         run: |
           docker tag nice_project "$DOCKER_USER"/nice_project_nice_project:latest
+          SHORT_SHA="${GITHUB_SHA:0:7}"
           echo '::set-env name=SHORT_SHA::"${GITHUB_SHA:0:7}"'
           docker tag nice_project "$DOCKER_USER"/nice_project_nice_project:"$SHORT_SHA"
       - name: Tagging image with a release tag
