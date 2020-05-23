@@ -24,7 +24,7 @@ jobs:
           echo '::set-env name=SHORT_SHA::"${GITHUB_SHA:0:7}"'
           docker tag nice_project "$DOCKER_USER"/nice_project_nice_project:"$SHORT_SHA"
       - name: Tagging image with a release tag
-        if: ${{ github.even_name == release }}
+        if: ${{ github.even_name == "release" }}
         run: docker tag nice_project "$DOCKER_USER"/nice_project_nice_project:"$GITHUB_REF"
       - name: Loging into dockerhub
         run: 
@@ -34,7 +34,7 @@ jobs:
           docker push "$DOCKER_USER"/nice_project_nice_project:latest
           docker push "$DOCKER_USER"/nice_project_nice_project:"$SHORT_SHA"
       - name: Pushing image with a release tag
-        if: ${{ github.even_name == release }}
+        if: ${{ github.even_name == "release" }}
         run: docker push "$DOCKER_USER"/nice_project_nice_project:"$GITHUB_REF"
       - name: Logint out of dockerhub
         run: docker logout
