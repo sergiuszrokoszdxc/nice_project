@@ -42,13 +42,13 @@ jobs:
         run: |
           docker push "$DOCKER_USER"/nice_project_nice_project:latest
           docker push "$DOCKER_USER"/nice_project_nice_project:"$SHORT_SHA"
-          docker tag nginx "$DOCKER_USER"/nice_project_nginx:latest
-          docker tag nginx "$DOCKER_USER"/nice_project_nginx:"$SHORT_SHA"
+          docker push nginx "$DOCKER_USER"/nice_project_nginx:latest
+          docker push nginx "$DOCKER_USER"/nice_project_nginx:"$SHORT_SHA"
       - name: Pushing image with a release tag
         if: ${{ github.event_name == 'release' }}
         run: |
           docker push "$DOCKER_USER"/nice_project_nice_project:"$TAG"
-          docker tag nginx "$DOCKER_USER"/nice_project_nginx:"$TAG"
+          docker push nginx "$DOCKER_USER"/nice_project_nginx:"$TAG"
       - name: Logint out of dockerhub
         run: docker logout
     env:
