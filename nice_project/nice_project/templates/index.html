@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <body>
-<img src={{ url_for('static', filename='logo.png') }}/>
+<img src="{{ url_for('static', filename='logo.png') }}"/>
 {% for item in iterable %}
     <li>{{ item }}</li>
 {% endfor %}
