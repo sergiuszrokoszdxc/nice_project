@@ -17,12 +17,12 @@ services:
   nginx:
     build: 
       context: ./nginx
-      args:
-        - NICE_PROJECT_HOST=nice_project
-        - NICE_PROJECT_PORT=${NICE_PROJECT_PORT}
-        - NGINX_LISTEN_PORT=${NGINX_LISTEN_PORT}
     depends_on:
-      - nice_project
+        - nice_project
+    environment:
+      NICE_PROJECT_HOST: nice_project
+      NICE_PROJECT_PORT: ${NICE_PROJECT_PORT}
+      NGINX_LISTEN_PORT: ${NGINX_LISTEN_PORT}
     expose:
       - ${NGINX_LISTEN_PORT}
     ports:
