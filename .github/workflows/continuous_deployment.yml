@@ -11,44 +11,39 @@ on:
     types: [published]
 jobs:
   Build:
+    strategy:
+      service: [nice_project, nginx]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Build release image
         run: |
-          docker build --tag nice_project nice_project
-          docker build --tag nginx nginx
+          docker build --tag ${{ matrix.service }} ${{ matrix.service }}
       - name: Tagging realease image
       # jeśli byłoby więcej obrazów to można zastosować matrix + zmienne?
         run: |
-          docker tag nice_project "$DOCKER_USER"/nice_project_nice_project:latest
-          docker tag nginx "$DOCKER_USER"/nice_project_nginx:latest
+          docker tag ${{ matrix.service }} "$DOCKER_USER"/nice_project_${{ matrix.service }}:latest
           SHORT_SHA="${GITHUB_SHA:0:7}"
           echo '::set-env name=SHORT_SHA::'"$SHORT_SHA"
-          docker tag nice_project "$DOCKER_USER"/nice_project_nice_project:"$SHORT_SHA"
-          docker tag nginx "$DOCKER_USER"/nice_project_nginx:"$SHORT_SHA"
+          docker tag ${{ matrix.service }} "$DOCKER_USER"/nice_project_${{ matrix.service }}:"$SHORT_SHA"
       - name: Tagging image with a release tag
         if: ${{ github.event_name == 'release' }}
         run: |
           TAG="${GITHUB_REF##*/}"
           echo '::set-env name=TAG::'"$TAG"
-          docker tag nice_project "$DOCKER_USER"/nice_project_nice_project:"$TAG"
-          docker tag nginx "$DOCKER_USER"/nice_project_nginx:"$TAG"
+          docker tag ${{ matrix.service }} "$DOCKER_USER"/nice_project_${{ matrix.service }}:"$TAG"
       - name: Loging into dockerhub
         run: 
           echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
       - name: Pushing images
         run: |
-          docker push "$DOCKER_USER"/nice_project_nice_project:latest
-          docker push "$DOCKER_USER"/nice_project_nice_project:"$SHORT_SHA"
-          docker push nginx "$DOCKER_USER"/nice_project_nginx:latest
-          docker push nginx "$DOCKER_USER"/nice_project_nginx:"$SHORT_SHA"
+          docker push "$DOCKER_USER"/nice_project_${{ matrix.service }}:latest
+          docker push "$DOCKER_USER"/nice_project_${{ matrix.service }}:"$SHORT_SHA"
       - name: Pushing image with a release tag
         if: ${{ github.event_name == 'release' }}
         run: |
-          docker push "$DOCKER_USER"/nice_project_nice_project:"$TAG"
-          docker push nginx "$DOCKER_USER"/nice_project_nginx:"$TAG"
+          docker push "$DOCKER_USER"/nice_project_${{ matrix.service }}:"$TAG"
       - name: Logint out of dockerhub
         run: docker logout
     env:
