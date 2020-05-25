@@ -17,8 +17,8 @@ jobs:
         uses: actions/checkout@v2
       - name: Build release image
         run: |
-        docker build --tag nice_project nice_project
-        docker build --tag nginx nginx
+          docker build --tag nice_project nice_project
+          docker build --tag nginx nginx
       - name: Tagging realease image
       # jeśli byłoby więcej obrazów to można zastosować matrix + zmienne?
         run: |
