@@ -3,16 +3,13 @@ services:
 
   nice_project:
     build: ./nice_project
-    command:
-      - uwsgi
-      - --module nice_project.app:flask_app
-      - --socket 0.0.0.0:${NICE_PROJECT_PORT}
-      - --master
-      - --processes 1
-      - --threads 1
-      - --die-on-term
+    environment:
+      NICE_PROJECT_PORT: ${NICE_PROJECT_PORT}
     networks:
       - network
+    command:
+      - uwsgi
+      - wsgi.ini
 
   nginx:
     build: 

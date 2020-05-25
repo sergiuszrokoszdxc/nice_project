@@ -1,1 +1,2 @@
 include nice_project/templates/*.html
+include ./wsgi.ini
