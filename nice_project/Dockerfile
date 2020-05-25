@@ -34,6 +34,8 @@ COPY --from=build /wheel /wheel
 
 RUN python3 -m pip install --no-index --find-links=/wheel /wheel/*.whl
 
+COPY wsgi.ini wsgi.ini
+
 COPY entrypoint.sh entrypoint.sh
 
 RUN sed -i 's/\r$//' entrypoint.sh
