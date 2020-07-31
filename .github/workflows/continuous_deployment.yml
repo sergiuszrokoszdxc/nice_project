@@ -1,6 +1,3 @@
-#- dockercompose - build
-#- publish obrazu
-
 name: Continuous Deployment
 
 on:
@@ -10,7 +7,7 @@ on:
   release:
     types: [published]
 jobs:
-  Build:
+  Release:
     strategy:
       matrix:
         service: [nice_project, nginx]
@@ -18,35 +15,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Build release image
-        run: |
-          docker build --tag ${{ matrix.service }} ${{ matrix.service }}
-      - name: Tagging realease image
-      # jeśli byłoby więcej obrazów to można zastosować matrix + zmienne?
-        run: |
-          docker tag ${{ matrix.service }} "$DOCKER_USER"/nice_project_${{ matrix.service }}:latest
-          SHORT_SHA="${GITHUB_SHA:0:7}"
-          echo '::set-env name=SHORT_SHA::'"$SHORT_SHA"
-          docker tag ${{ matrix.service }} "$DOCKER_USER"/nice_project_${{ matrix.service }}:"$SHORT_SHA"
-      - name: Tagging image with a release tag
-        if: ${{ github.event_name == 'release' }}
-        run: |
-          TAG="${GITHUB_REF##*/}"
-          echo '::set-env name=TAG::'"$TAG"
-          docker tag ${{ matrix.service }} "$DOCKER_USER"/nice_project_${{ matrix.service }}:"$TAG"
-      - name: Loging into dockerhub
-        run: 
-          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
-      - name: Pushing images
-        run: |
-          docker push "$DOCKER_USER"/nice_project_${{ matrix.service }}:latest
-          docker push "$DOCKER_USER"/nice_project_${{ matrix.service }}:"$SHORT_SHA"
-      - name: Pushing image with a release tag
-        if: ${{ github.event_name == 'release' }}
-        run: |
-          docker push "$DOCKER_USER"/nice_project_${{ matrix.service }}:"$TAG"
-      - name: Logint out of dockerhub
-        run: docker logout
-    env:
-      DOCKER_USER: ${{ secrets.DOCKERHUB_ACCOUNT_NAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+      #- name: Azure Kubernetes set context
+      #  uses: Azure/aks-set-context@v1
+      #  with:
+      #    creds: ${{ secrets.AZURE_CREDENTIALS }}
+      #    resource-group: kubernetes
+      #    cluster-name: kubernetes
+      #- name: Deploy to Kubernetes cluster
+      #  uses: Azure/k8s-deploy@v1
+      #  with:
+      #    manifests: | 
+      #      deployment\kubernetes

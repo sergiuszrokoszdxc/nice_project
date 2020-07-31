@@ -1,0 +1,14 @@
+{% extends "index.html" %}
+{% block content %}
+<div id="content-main">
+    <div id="compliment">
+        {{ random_element }}
+    </div>
+    <div id="other-compliment">
+        <a href="{{ url_for('show') }}">Inny komplement</a>
+    </div>
+</div>
+<div class="content-change">
+    <a href="{{ url_for('submit') }}">submit</a>
+</div>
+{% endblock %}

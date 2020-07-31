@@ -2,6 +2,7 @@ version: "3.7"
 services:
 
   nice_project:
+    image: nice_project
     build: ./nice_project
     environment:
       NICE_PROJECT_PORT: ${NICE_PROJECT_PORT}
@@ -12,6 +13,7 @@ services:
       - wsgi.ini
 
   nginx:
+    image: nginx
     build: 
       context: ./nginx
     depends_on:

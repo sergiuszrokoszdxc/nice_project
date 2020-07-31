@@ -1,32 +1,36 @@
-import datetime
+import random
 
 from flask import Flask
 from flask import render_template
+from flask import request
 
-from nice_project.utils.memory import Memory
-from nice_project.utils.stoper import Stoper
+flask_app = Flask(__name__)
 
-flask_app = Flask(__name__, static_folder="../nginx/static")
+memory = []
 
-memory = Memory(8)
+@flask_app.route("/show", methods=["GET"])
+def show():
+    try:
+        random_element = random.choice(memory)
+    except IndexError:
+        random_element = ""
+    return render_template(
+        "show.html",
+        random_element=random_element
+        )
 
+@flask_app.route("/submit", methods=["GET", "POST"])
+def submit():
+    thanks = False
+    if request.method == "POST":
+        compliment = request.form.get("compliment")
+        memory.append(compliment)
+        thanks = True
+    return render_template(
+        "submit.html",
+        thanks=thanks
+        )
 
-def store_with_time(value):
-    return datetime.datetime.now(), value
-
-
-function = store_with_time
-stoper = Stoper(memory, function)
-
-
-@flask_app.route("/")
+@flask_app.route("/index")
 def index():
-    iterable = stoper.get_stored()
-    return render_template("index.html", iterable=iterable)
-
-
-@flask_app.route("/store/<string:text>")
-def save_text(text):
-    stoper.stop(text)
-    iterable = stoper.get_stored()
-    return render_template("index.html", iterable=iterable)
+    return render_template("index.html")

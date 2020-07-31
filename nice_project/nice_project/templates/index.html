@@ -1,9 +1,32 @@
 <!DOCTYPE html>
 <html>
-<body>
-<img src="{{ url_for('static', filename='logo.png') }}"/>
-{% for item in iterable %}
-    <li>{{ item }}</li>
-{% endfor %}
-</body>
+    <head>
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    </head>
+    <body>
+        <div id="main">
+            <div class="header">
+                <div id="logo" style="float: left;">
+                    <img id="logo-img" src="{{ url_for('static', filename='logo.png') }}"/>
+                </div>
+                <div id="title" style="float: left;">
+                    <p>Komplementy dla Anii</p>
+                </div>
+                <div style="clear: both;"></div>
+            </div>
+            <div id="content">
+                {% block content %}
+                <div id="content-choice">
+                    <div class="crossroads">
+                        <a href="{{ url_for('show') }}">show</a>
+                    </div>
+                    <div class="crossroads">
+                        <a href="{{ url_for('submit') }}">submit</a>
+                    </div>
+                    <div style="clear: both;"></div>
+                </div>
+                {% endblock %}
+            </div>
+        </div>
+    </body>
 </html>

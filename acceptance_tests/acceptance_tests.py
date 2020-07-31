@@ -11,10 +11,15 @@ URL = "http://" + HOST + ":" + PORT
 class TestAcceptance(unittest.TestCase):
     def test_index(self):
         """in progress"""
-        r = requests.get(URL)
+        r = requests.get(URL + "/index")
         self.assertEqual(r.status_code, 200)
 
-    def test_save_test(self):
+    def test_show(self):
         """in progress"""
-        r = requests.get(URL)
+        r = requests.get(URL + "/show")
+        self.assertEqual(r.status_code, 200)
+
+    def test_submit(self):
+        """in progress"""
+        r = requests.get(URL + "/submit")
         self.assertEqual(r.status_code, 200)
