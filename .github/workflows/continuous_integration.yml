@@ -37,8 +37,6 @@ jobs:
           SERVICE_PORT: 5000
       - name: Tagging realease image
         run: |
-          echo "::set-env name=DOCKER_USER::${{ secrets.DOCKERHUB_ACCOUNT_NAME }}"
-          echo "::set-env name=DOCKER_PASSWORD::${{ secrets.DOCKERHUB_PASSWORD }}"
           docker tag ${{ matrix.service }} ${DOCKER_USER}/nice_project_${{ matrix.service }}:latest
           SHORT_SHA="${GITHUB_SHA:0:7}"
           echo "::set-env name=SHORT_SHA::${SHORT_SHA}"
@@ -62,3 +60,7 @@ jobs:
           docker push ${DOCKER_USER}/nice_project_${{ matrix.service }}:${TAG}
       - name: Logint out of dockerhub
         run: docker logout
+    env:
+      DOCKER_USER: ${{ secrets.DOCKERHUB_ACCOUNT_NAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+
