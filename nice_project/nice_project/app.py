@@ -32,7 +32,7 @@ def submit():
         thanks=thanks
         )
 
-@flask_app.route("/index")
+@flask_app.route("/")
 def index():
     # TODO: Add a game
     return render_template("index.html")
