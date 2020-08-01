@@ -1,0 +1,39 @@
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nice-project-deployment
+  labels:
+    app: nice-project
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nice-project
+  template:
+    metadata:
+      labels:
+        app: nice-project
+    spec:
+      containers:
+      - name: nice-project
+        image: sergiuszrokoszdxc/nice_project_nice_project
+        ports:
+        - containerPort: 5001 # TODO: configuration variable
+        env:
+        - name: NICE_PROJECT_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: nice-project-config
+              key: NICE_PROJECT_PORT
+        command: [ "uwsgi", "wsgi.ini" ]
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nice-project-config
+data:
+  NICE_PROJECT_PORT: "5001" # TODO: configuration variable
