@@ -11,7 +11,7 @@ class TestApp(unittest.TestCase):
 
     def test_index(self):
         """in progress"""
-        r = self.client.get("/index")
+        r = self.client.get("/")
         self.assertEqual(r.status_code, 200)
 
     def test_show(self):
