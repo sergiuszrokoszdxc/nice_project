@@ -6,7 +6,7 @@
             "value": "latest"
         },
         "publicPort": {
-            "value": "5000"
+            "value": "80"
         }
     }
 }

@@ -36,22 +36,13 @@
                             },
                             "environmentVariables": [
                                 {
-                                    "name": "FLASK_APP",
-                                    "value": "nice_project.app:flask_app"
-                                },
-                                {
                                     "name": "NICE_PROJECT_PORT",
                                     "value": "[parameters('publicPort')]"
-                                },
-                                {
-                                    "name": "FLASK_ENV",
-                                    "value": "developement"
                                 }
-                                
                             ],
                             "command":  [
                                 "uwsgi",
-                                "wsgi"
+                                "wsgi.ini"
                             ]
                         }
                     }
