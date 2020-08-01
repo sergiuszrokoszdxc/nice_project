@@ -19,14 +19,6 @@ jobs:
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-      # TODO: in the future can be dangerous
-      - name: Tear down resource-group
-        uses: azure/CLI@v1
-        with:
-          inlineScript: >
-            az deployment group delete 
-            -n compApp
-            -g ComplimentApp
       - name: Deploy
         uses: azure/CLI@v1
         with:
