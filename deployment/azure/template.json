@@ -1,0 +1,109 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "rgName": {
+            "type": "string"
+        },
+        "rgLocation": {
+            "type": "string"
+        },
+        "tag": {
+            "type": "string"
+        },
+        "publicPort": {
+            "type": "string"
+        }
+    },
+    "functions": [],
+    "variables": {},
+    "resources": [
+        {
+            "name": "[parameters('rgName')]",
+            "type": "Microsoft.Resources/resourceGroups",
+            "location": "[parameters('rgLocation')]",
+            "apiVersion": "2020-06-01"
+        },
+        {
+            "name": "appDeployment",
+            "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[parameters('rgName')]",
+            "apiVersion": "2020-06-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/resourceGroups', parameters('rgName'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {},
+                    "variables": {},
+                    "resources": [
+                        {
+                            "name": "app-container",
+                            "type": "Microsoft.ContainerInstance/containerGroups",
+                            "apiVersion": "2018-10-01",
+                            "location": "[parameters('rgLocation')]",
+                            "properties": {
+                                "containers": [
+                                    {
+                                        "name": "app",
+                                        "properties": {
+                                            "image": "[concat('sergiuszrokoszdxc/nice_project_nice_project:', parameters('tag'))]",
+                                            "ports": [
+                                                {
+                                                    "port": "[parameters('publicPort')]"
+                                                }
+                                            ],
+                                            "resources": {
+                                                "requests": {
+                                                    "cpu": 1,
+                                                    "memoryInGB": 4
+                                                }
+                                            },
+                                            "environmentVariables": [
+                                                {
+                                                    "name": "FLASK_APP",
+                                                    "value": "nice_project.app:flask_app"
+                                                },
+                                                {
+                                                    "name": "NICE_PROJECT_PORT",
+                                                    "value": "[parameters('publicPort')]"
+                                                },
+                                                {
+                                                    "name": "FLASK_ENV",
+                                                    "value": "developement"
+                                                }
+                                                
+                                            ],
+                                            "command":  [
+                                                "flask",
+                                                "run",
+                                                "-h",
+                                                "0.0.0.0"
+                                            ]
+                                        }
+                                    }
+                                ],
+                                "osType": "Linux",
+                                "restartPolicy": "OnFailure",
+                                "ipAddress": {
+                                    "type": "Public",
+                                    "ports": [
+                                        {
+                                            "protocol": "TCP",
+                                            "port": "[parameters('publicPort')]"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    "outputs": {}
+                }
+            }
+        }
+    ],
+    "outputs": {}
+}
