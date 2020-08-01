@@ -30,17 +30,16 @@ jobs:
       - name: Acceptance tests
         run: |
           docker-compose up acceptance_tests
-          docker-compose down
         env:
           NGINX_LISTEN_PORT: 5002
           NICE_PROJECT_PORT: 5001
           SERVICE_PORT: 5000
       - name: Tagging realease image
         run: |
-          docker tag ${{ matrix.service }} ${DOCKER_USER}/nice_project_${{ matrix.service }}:latest
+          docker tag ${{ matrix.service }} "${DOCKER_USER}/nice_project_${{ matrix.service }}:latest"
           SHORT_SHA="${GITHUB_SHA:0:7}"
           echo "::set-env name=SHORT_SHA::${SHORT_SHA}"
-          docker tag ${{ matrix.service }} "${DOCKER_USER}/nice_project_${{ matrix.service }}:${SHORT_SHA}""
+          docker tag ${{ matrix.service }} "${DOCKER_USER}/nice_project_${{ matrix.service }}:${SHORT_SHA}"
       - name: Tagging image with a release tag
         if: ${{ github.event_name == 'release' }}
         run: |
