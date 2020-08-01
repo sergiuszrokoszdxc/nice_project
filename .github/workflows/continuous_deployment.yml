@@ -22,5 +22,10 @@ jobs:
       - name: Azure CLI script
         uses: azure/CLI@v1
         with:
-          inlineScript: |
-            deployment sub create -n compApp --subscription ${{ secrets.AZURE_SUB_ID }}  -f deployment/azure/template.json -p @deployment/azure/parameters.json
+          inlineScript: >
+            az deployment group create
+            -n compApp
+            --group ComplimentApp
+            -m Incremental
+            -f deployment/azure/template.json
+            -p @deployment/azure/parameters.json
