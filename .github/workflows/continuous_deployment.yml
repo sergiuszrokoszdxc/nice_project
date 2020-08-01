@@ -26,6 +26,6 @@ jobs:
             az deployment group create
             -n compApp
             -g ComplimentApp
-            -m Incremental
+            --mode Incremental
             -f deployment/azure/template.json
             -p @deployment/azure/parameters.json
