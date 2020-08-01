@@ -28,12 +28,13 @@ jobs:
           NICE_PROJECT_PORT: 5001
           SERVICE_PORT: 5000
       - name: Acceptance tests
-        run: |
-          docker-compose up acceptance_tests
+        run: docker-compose up acceptance_tests
         env:
           NGINX_LISTEN_PORT: 5002
           NICE_PROJECT_PORT: 5001
           SERVICE_PORT: 5000
+      - name: Tear down docker-compose
+        run: docker-compose down
       - name: Tagging realease image
         run: |
           docker tag ${{ matrix.service }} "${DOCKER_USER}/nice_project_${{ matrix.service }}:latest"
@@ -55,8 +56,7 @@ jobs:
           docker push ${DOCKER_USER}/nice_project_${{ matrix.service }}:${SHORT_SHA}
       - name: Pushing image with a release tag
         if: ${{ github.event_name == 'release' }}
-        run: |
-          docker push ${DOCKER_USER}/nice_project_${{ matrix.service }}:${TAG}
+        run: docker push ${DOCKER_USER}/nice_project_${{ matrix.service }}:${TAG}
       - name: Logint out of dockerhub
         run: docker logout
     env:
