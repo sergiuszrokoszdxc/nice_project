@@ -38,27 +38,27 @@ jobs:
       - name: Tagging realease image
         run: |
           echo "::set-env name=DOCKER_USER::${{ secrets.DOCKERHUB_ACCOUNT_NAME }}"
-          echo '::set-env name=DOCKER_PASSWORD::'${{ secrets.DOCKERHUB_PASSWORD }}
-          docker tag ${{ matrix.service }} "$DOCKER_USER"/nice_project_${{ matrix.service }}:latest
+          echo '::set-env name=DOCKER_PASSWORD::${{ secrets.DOCKERHUB_PASSWORD }}"
+          docker tag ${{ matrix.service }} ${DOCKER_USER}/nice_project_${{ matrix.service }}:latest
           SHORT_SHA="${GITHUB_SHA:0:7}"
-          echo '::set-env name=SHORT_SHA::'"$SHORT_SHA"
-          docker tag ${{ matrix.service }} "$DOCKER_USER"/nice_project_${{ matrix.service }}:"$SHORT_SHA"
+          echo "::set-env name=SHORT_SHA::${SHORT_SHA}"
+          docker tag ${{ matrix.service }} ${DOCKER_USER}/nice_project_${{ matrix.service }}:${SHORT_SHA}
       - name: Tagging image with a release tag
         if: ${{ github.event_name == 'release' }}
         run: |
           TAG="${GITHUB_REF##*/}"
-          echo '::set-env name=TAG::'"$TAG"
-          docker tag ${{ matrix.service }} "$DOCKER_USER"/nice_project_${{ matrix.service }}:"$TAG"
+          echo "::set-env name=TAG::${TAG}"
+          docker tag ${{ matrix.service }} ${DOCKER_USER}/nice_project_${{ matrix.service }}:${TAG}
       - name: Loging into dockerhub
         run: 
-          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
+          echo "$DOCKER_PASSWORD" | docker login -u "${DOCKER_USER}" --password-stdin
       - name: Pushing images
         run: |
-          docker push "$DOCKER_USER"/nice_project_${{ matrix.service }}:latest
-          docker push "$DOCKER_USER"/nice_project_${{ matrix.service }}:"$SHORT_SHA"
+          docker push ${DOCKER_USER}/nice_project_${{ matrix.service }}:latest
+          docker push ${DOCKER_USER}/nice_project_${{ matrix.service }}:${SHORT_SHA}
       - name: Pushing image with a release tag
         if: ${{ github.event_name == 'release' }}
         run: |
-          docker push "$DOCKER_USER"/nice_project_${{ matrix.service }}:"$TAG"
+          docker push ${DOCKER_USER}/nice_project_${{ matrix.service }}:${TAG}
       - name: Logint out of dockerhub
         run: docker logout
