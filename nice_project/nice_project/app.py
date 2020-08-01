@@ -26,6 +26,7 @@ def submit():
         compliment = request.form.get("compliment")
         memory.append(compliment)
         thanks = True
+    # TODO: What if wrong form
     return render_template(
         "submit.html",
         thanks=thanks
@@ -33,4 +34,5 @@ def submit():
 
 @flask_app.route("/index")
 def index():
+    # TODO: Add a game
     return render_template("index.html")
