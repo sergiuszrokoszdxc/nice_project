@@ -1,7 +1,6 @@
 import datetime
 import unittest
 
-from nice_project.app import store_with_time
 from nice_project.app import flask_app
 
 
