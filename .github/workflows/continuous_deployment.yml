@@ -25,7 +25,7 @@ jobs:
           inlineScript: >
             az deployment group create
             -n compApp
-            --group ComplimentApp
+            --resource-group ComplimentApp
             -m Incremental
             -f deployment/azure/template.json
             -p @deployment/azure/parameters.json
