@@ -91,11 +91,11 @@ class GameEnded(BaseException):
 class Game:
 
     class Status(Enum):
-        NOT_STARTED = "Game not yet started."
+        NOT_STARTED = "Welcome to the game! Try guessing the sequence."
         IN_PROGRESS = "Last guess was wrong. Try again."
-        SEQUENCE_NOT_VALID = "Last sequence supplied was not valid."
+        SEQUENCE_NOT_VALID = "Last sequence supplied was not valid. Try again."
         WIN = "Congratulations. You won!!!."
-        MAX_TRIES_EXCEEDED = "You Lose."
+        MAX_TRIES_EXCEEDED = "You Lose. Better luck next time!"
 
     def __init__(self, n_colours=5, n_pos=4, max_tries=10):
         self._game_instance = Mastermind(
@@ -150,14 +150,13 @@ class Game:
         print(self._status.value)
 
     def play(self):
-        if self.has_ended:
-            print("Game has already ended.")
-        else:
-            print("Welcome to the game! Try guessing the sequence.")
-            while (self._game_instance.tries_left):
+        while True:
+            self.print_message()
+            if not self.has_ended:
                 if past_guesses := self.get_history():
                     print(past_guesses)
                 in_ = input()
                 in_ = [int(x) for x in in_.split(" ")]
                 self.guess(in_)
-                self.print_message()
+            else:
+                break

@@ -16,6 +16,13 @@ game = Game()
 
 @app.get("/", response_class=HTMLResponse)
 async def get_index(request: Request):
+    status = game.last_game_status
+    msg = status.value
+    if game.has_ended:
+        game = Game()
+
+
+
     history = game.get_history()
     tries_left = game.game_instance.tries_left
     return templates.TemplateResponse(
