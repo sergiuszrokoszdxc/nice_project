@@ -138,12 +138,15 @@ class Game:
                 if self._game_instance.tries_left == 0:
                     self._status = self.Status.MAX_TRIES_EXCEEDED
 
-    def get_history(self) -> str:
-        lines = [
+    def get_history_list(self) -> List[str]:
+        return [
             "|".join(str(g) for g in guess) + f": {hint}" 
             for guess, hint 
             in self._game_instance.past_sequences
             ]
+
+    def get_history_str(self) -> str:
+        lines = self.get_history_list()
         return "\n".join(lines)
 
     def print_message(self):
@@ -153,7 +156,7 @@ class Game:
         while True:
             self.print_message()
             if not self.has_ended:
-                if past_guesses := self.get_history():
+                if past_guesses := self.get_history_str():
                     print(past_guesses)
                 in_ = input()
                 in_ = [int(x) for x in in_.split(" ")]
