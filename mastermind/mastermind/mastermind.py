@@ -1,7 +1,7 @@
 from collections import Counter, namedtuple
 from enum import Enum
 from itertools import compress
-from random import sample
+from random import choices
 from typing import List, Sequence, Tuple
 
 PastGuess = namedtuple("PastGuess", "guess hint")
@@ -14,14 +14,14 @@ class SequenceNonValid(BaseException):
 
 class Mastermind:
     def __init__(self, n_colours=5, n_pos=4, max_tries=10):
-        self._sequence = sample(range(n_colours), n_pos)
+        self._sequence = choices(range(n_colours), k=n_pos)
         self._n_colours = n_colours
         self._n_pos = n_pos
         self._max_tries = max_tries
         self._memory = []
 
     def guess(self, proposed_sequence: Sequence[int]) -> str:
-        if self.n_try < self._max_tries:
+        if self.tries_left:
             # if not valid exception is raised
             self._validate(proposed_sequence)
             hint = self._guess(proposed_sequence)
@@ -38,6 +38,10 @@ class Mastermind:
     @property
     def n_try(self) -> int:
         return len(self._memory)
+
+    @property
+    def n_colours(self) -> int:
+        return self._n_colours
 
     @property
     def max_tries(self) -> int:
@@ -81,48 +85,79 @@ class Mastermind:
 
         return n_correct_pos, n_correct_col
 
+class GameEnded(BaseException):
+    pass
 
 class Game:
 
     class Status(Enum):
         NOT_STARTED = "Game not yet started."
-        IN_PROGRESS = ""
-        SEQUENCE_NOT_VALID = ""
-        WIN = "Sequence supplied is not valid."
-        MAX_TRIES_EXCEEDED = ""
+        IN_PROGRESS = "Last guess was wrong. Try again."
+        SEQUENCE_NOT_VALID = "Last sequence supplied was not valid."
+        WIN = "Congratulations. You won!!!."
+        MAX_TRIES_EXCEEDED = "You Lose."
 
     def __init__(self, n_colours=5, n_pos=4, max_tries=10):
-        self.game_instance = Mastermind(n_colours=5, n_pos=4, max_tries=10)
-        self.status = Status.NOT_STARTED
+        self._game_instance = Mastermind(
+            n_colours=n_colours,
+            n_pos=n_pos,
+            max_tries=max_tries
+            )
+        self._status = self.Status.NOT_STARTED
 
-    def guess(self, proposed_sequence: Sequence[int]) -> str:
+    def __repr__(self) -> str:
+        return (
+            f"<Game(n_colours={self._game_instance.n_colours}, "
+            f"n_pos={self._game_instance.sequence_lenght}, "
+            f"max_tries={self._game_instance.max_tries}): {self._status}>"
+        )
+
+    @property
+    def has_ended(self) -> bool:
+        return (
+            self._status == self.Status.WIN
+            or self._status == self.Status.MAX_TRIES_EXCEEDED
+        )
+
+    @property
+    def last_game_status(self) -> Status:
+        return self._status
+
+    def guess(self, proposed_sequence: Sequence[int]):
+        if self.has_ended:
+            raise GameEnded
         try:
-            hint = self.game_instance.guess(proposed_sequence)
+            hint = self._game_instance.guess(proposed_sequence)
         except SequenceNonValid:
-            self.status = Status.SEQUENCE_NOT_VALID
+            self._status = self.Status.SEQUENCE_NOT_VALID
         else:
-            self.status = Status.IN_PROGRESS
-            if hint[1] == 0 and hint[0] == self.game_instance.sequence_lenght:
-                self.status = Status.WIN
+            self._status = self.Status.IN_PROGRESS
+            if hint[1] == 0 and hint[0] == self._game_instance.sequence_lenght:
+                self._status = self.Status.WIN
             else:
-                self.msg = f"Pins in good position: {hint[0]}. Pins in good colour: {hint[1]}."
-                if self.game_instance.tries_left == 0:
-                    self.status = Status.MAX_TRIES_EXCEEDED
-                    msg += "\n All tries used. You lose."
-        return msg
+                if self._game_instance.tries_left == 0:
+                    self._status = self.Status.MAX_TRIES_EXCEEDED
 
     def get_history(self) -> str:
-        lines = ["|".join(str(g) for g in guess) + f": {hint}" for guess, hint in self.game_instance.past_sequences]
+        lines = [
+            "|".join(str(g) for g in guess) + f": {hint}" 
+            for guess, hint 
+            in self._game_instance.past_sequences
+            ]
         return "\n".join(lines)
 
-    def play(self):
-        while True:
-            in_ = input()
-            in_ = [int(x) for x in in_.split(" ")]
-            try:
-                print(self.guess(in_))
-            except MaxTriesExceeded:
-                self.game_instance = Mastermind(n_colours=5, n_pos=4, max_tries=10)
-            else:
-                print(self.get_history())
+    def print_message(self):
+        print(self._status.value)
 
+    def play(self):
+        if self.has_ended:
+            print("Game has already ended.")
+        else:
+            print("Welcome to the game! Try guessing the sequence.")
+            while (self._game_instance.tries_left):
+                if past_guesses := self.get_history():
+                    print(past_guesses)
+                in_ = input()
+                in_ = [int(x) for x in in_.split(" ")]
+                self.guess(in_)
+                self.print_message()

@@ -16,12 +16,14 @@ class TestMastermind(unittest.TestCase):
 
     def test_guess(self):
         """in progress"""
-        mm = Mastermind()
-        res = mm.guess(tuple(reversed(mm._sequence)))
+        mm = Mastermind(n_colours=4, n_pos=4, max_tries=10)
+        seq = list(mm._sequence)
+        seq[0] = (seq[0] + 1) % 3
+        res = mm.guess(seq)
         self.assertIsInstance(res, tuple)
         self.assertEqual(len(res), 2)
-        self.assertEqual(res[0], 0)
-        self.assertEqual(res[1], len(mm._sequence))
+        self.assertLess(res[0], mm.sequence_lenght)
+        self.assertLess(res[1], mm.sequence_lenght)
 
     def test_validate(self):
         """in progress"""
