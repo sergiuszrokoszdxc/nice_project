@@ -1,12 +1,13 @@
-from mastermind.mastermind import Game
+import asyncio
+from typing import Optional
 
 from fastapi import FastAPI, Form, Request, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
-import asyncio
-# TODO: MAKE IT SO IT IS AVAILABLE ONLY LIMITED AMOUNT OF TIME
+from mastermind.mastermind import Game
 
+# TODO: MAKE IT SO IT IS AVAILABLE ONLY LIMITED AMOUNT OF TIME
 
 app = FastAPI()
 
@@ -43,14 +44,14 @@ async def get_index(request: Request):
 @app.post("/")
 async def post_index(
     request: Request,
-    first: int = Form(None, ge=0, le=4),
-    second: int = Form(None, ge=0, le=4),
-    third: int = Form(None, ge=0, le=4),
-    fourth: int = Form(None, ge=0, le=4),
+    first: Optional[int] = Form(None, ge=0, le=4),
+    second: Optional[int] = Form(None, ge=0, le=4),
+    third: Optional[int] = Form(None, ge=0, le=4),
+    fourth: Optional[int] = Form(None, ge=0, le=4),
 ):
     seq = []
     for el in [first, second, third, fourth]:
-        if el:
+        if el is not None:
             seq.append(el)
     game.guess(seq)
     return RedirectResponse(
