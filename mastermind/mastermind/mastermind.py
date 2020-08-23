@@ -13,10 +13,10 @@ class SequenceNonValid(BaseException):
     """Supplied sequence is not valid."""
 
 class Mastermind:
-    def __init__(self, n_colours=5, n_pos=4, max_tries=10):
-        self._sequence = choices(range(n_colours), k=n_pos)
+    def __init__(self, n_colours=5, n_positions=4, max_tries=10):
+        self._sequence = choices(range(n_colours), k=n_positions)
         self._n_colours = n_colours
-        self._n_pos = n_pos
+        self._n_pos = n_positions
         self._max_tries = max_tries
         self._memory = []
 
@@ -52,7 +52,7 @@ class Mastermind:
         return self._memory
 
     @property
-    def sequence_lenght(self) -> int:
+    def n_positions(self) -> int:
         return self._n_pos
 
     def _validate(self, sequence: Sequence[int]) -> None:
@@ -100,7 +100,7 @@ class Game:
     def __init__(self, n_colours=5, n_pos=4, max_tries=10):
         self._game_instance = Mastermind(
             n_colours=n_colours,
-            n_pos=n_pos,
+            n_positions=n_pos,
             max_tries=max_tries
             )
         self._status = self.Status.NOT_STARTED
@@ -108,7 +108,7 @@ class Game:
     def __repr__(self) -> str:
         return (
             f"<Game(n_colours={self._game_instance.n_colours}, "
-            f"n_pos={self._game_instance.sequence_lenght}, "
+            f"n_pos={self._game_instance.n_positions}, "
             f"max_tries={self._game_instance.max_tries}): {self._status}>"
         )
 
@@ -136,7 +136,7 @@ class Game:
             self._status = self.Status.SEQUENCE_NOT_VALID
         else:
             self._status = self.Status.IN_PROGRESS
-            if hint[1] == 0 and hint[0] == self._game_instance.sequence_lenght:
+            if hint[1] == 0 and hint[0] == self._game_instance.n_positions:
                 self._status = self.Status.WIN
             else:
                 if self._game_instance.tries_left == 0:
