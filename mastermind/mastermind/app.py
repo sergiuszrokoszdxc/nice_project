@@ -33,16 +33,6 @@ app.add_middleware(
 
 games = dict()
 
-games["1"] = [Mastermind(), False]
-games["2"] = [Mastermind(2,2,3), False]
-games["3"] = [Mastermind(2,2,3), False]
-
-games["1"][0].guess([1,2,1,1])
-games["1"][0].guess([1,2,1,1])
-games["1"][0].guess([1,2,1,1])
-games["1"][0].guess([1,2,1,1])
-games["2"][1] = True
-
 class Game(BaseModel):
     n_colours: int
     n_positions: int
@@ -71,15 +61,14 @@ async def get_game():
         }
         for id_, (game, has_ended) in games.items()
     ]
-    print(games_list)
     return games_list
 
 @app.post("/game", response_model=GameOut)
 async def post_game(game: Game):
     global games
-    id_ = hashlib.sha1(game.json(sort_keys=True)).hexdigest()
+    id_ = hashlib.sha1(game.json(sort_keys=True).encode()).hexdigest()
     m = Mastermind(**game.dict())
-    games[id_] = [game, False]
+    games[id_] = [m, False]
     game_out = GameOut(id_=id_, has_ended=False, **game.dict())
     return game_out
 
@@ -89,7 +78,10 @@ async def get_guess(game_id: str):
     game, has_ended = games[game_id]
     history = game.past_sequences
     return {
-        # game
+        # poprawić TODO:
+        "n_colours": game.n_colours,
+        "n_positions": game.n_positions,
+        "max_tries": game.max_tries,
         "has_ended": has_ended,
         "history": history,
         "win_token": False
@@ -120,7 +112,9 @@ async def post_guess(game_id: str, guess: List[int]):
         win_token = False
     history = game.past_sequences
     return {
-        # game,
+        "n_colours": game.n_colours,
+        "n_positions": game.n_positions,
+        "max_tries": game.max_tries,
         "has_ended": has_ended,
         "history": history,
         "win_token": win_token
