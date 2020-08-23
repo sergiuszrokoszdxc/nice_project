@@ -1,9 +1,12 @@
 import asyncio
-from typing import Optional
+import random
+from typing import Optional, List
 
 from fastapi import FastAPI, Form, Request, status
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
+from pydantic import BaseModel
 
 from mastermind.mastermind import Game
 
@@ -11,7 +14,19 @@ from mastermind.mastermind import Game
 
 app = FastAPI()
 
-templates = Jinja2Templates(directory='templates')
+templates = Jinja2Templates(directory='mastermind/templates')
+
+origins = [
+    "http://localhost:3000/"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 game = Game(n_colours=5, n_pos=4, max_tries=10)
 
@@ -20,8 +35,8 @@ msg_alternatives = {
     Game.Status.MAX_TRIES_EXCEEDED: "You Lose. How about next game?",
 }
 
-@app.get("/", response_class=HTMLResponse)
-async def get_index(request: Request):
+@app.get("/test")
+async def get_test():
     global game
     status = game.last_game_status
     msg = status.value
@@ -30,31 +45,14 @@ async def get_index(request: Request):
         msg = msg_alternatives[status]
         history = []
     else:
-        history = game.get_history_list()
-    return templates.TemplateResponse(
-        "item.html",
-        {
-            "request": request,
-            "msg": msg,
-            "history": history
+        history = game.past_sequences
+    return {
+        "history": history,
+        "msg": msg
         }
-    )
+       
 
-        
-@app.post("/")
-async def post_index(
-    request: Request,
-    first: Optional[int] = Form(None, ge=0, le=4),
-    second: Optional[int] = Form(None, ge=0, le=4),
-    third: Optional[int] = Form(None, ge=0, le=4),
-    fourth: Optional[int] = Form(None, ge=0, le=4),
-):
-    seq = []
-    for el in [first, second, third, fourth]:
-        if el is not None:
-            seq.append(el)
-    game.guess(seq)
-    return RedirectResponse(
-        request.url_for("get_index"),
-        status_code=status.HTTP_303_SEE_OTHER
-    )
+@app.post("/test")
+async def post_test(guess: List[int]):
+    game.guess(guess)
+    return {}

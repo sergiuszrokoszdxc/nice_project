@@ -7,10 +7,10 @@ from typing import List, Sequence, Tuple
 PastGuess = namedtuple("PastGuess", "guess hint")
 
 class MaxTriesExceeded(BaseException):
-    pass
+    """Max number of tries exceeded for this game."""
 
 class SequenceNonValid(BaseException):
-    pass
+    """Supplied sequence is not valid."""
 
 class Mastermind:
     def __init__(self, n_colours=5, n_pos=4, max_tries=10):
@@ -122,6 +122,10 @@ class Game:
     @property
     def last_game_status(self) -> Status:
         return self._status
+
+    @property
+    def past_sequences(self) -> Status:
+        return self._game_instance.past_sequences
 
     def guess(self, proposed_sequence: Sequence[int]):
         if self.has_ended:
