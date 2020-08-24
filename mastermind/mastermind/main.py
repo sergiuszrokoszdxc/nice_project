@@ -1,12 +1,8 @@
 import asyncio
 import hashlib
-import random
-from typing import Optional, List
+from typing import List
 
-from fastapi import Depends, FastAPI, Form, Request, status
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.templating import Jinja2Templates
+from fastapi import FastAPI
 from pydantic import BaseModel
 
 from mastermind.mastermind import Mastermind, MaxTriesExceeded
@@ -18,14 +14,6 @@ from mastermind.mastermind import Mastermind, MaxTriesExceeded
 # TODO:
 
 app = FastAPI()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 games = dict()
 
@@ -65,7 +53,7 @@ async def post_game(game: Game):
     id_ = hashlib.sha1(game.json(sort_keys=True).encode()).hexdigest()
     m = Mastermind(**game.dict())
     games[id_] = [m, False]
-    game_out = GameOut(id_=id_, has_ended=False, **game.dict())
+    game_out = dict(id_=id_, has_ended=False, **game.dict())
     return game_out
 
 @app.get("/game/{game_id}")

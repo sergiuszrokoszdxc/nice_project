@@ -1,24 +1,42 @@
-version: "3.7"
+version: "3.3"
 services:
+
+  traefik:
+    image: traefik
+    command: --api.insecure=true --providers.docker --providers.docker.exposedByDefault=false
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - network
 
   mastermind:
     image: mastermind
     build: ./mastermind
+    depends_on:
+      - traefik
     environment:
       MODULE_NAME: "mastermind.main"
+      MAX_WORKERS: 1
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=mastermind"
+      - "traefik.http.routers.mastermind.rule=PathPrefix(`/game`)"
     networks:
       - network
-
+# TODO: database backend i max_workers > 1
   frontend:
     image: front_end
     build: 
       context: ./front_end/front_end
     depends_on:
         - mastermind
-    expose:
-      - 80
-    ports:
-      - 80:80
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=front_end"
+      - "traefik.http.routers.front_end.rule=PathPrefix(`/`)"
     networks:
       - network
 

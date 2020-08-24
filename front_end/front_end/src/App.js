@@ -49,10 +49,10 @@ class HomeScreen extends React.Component {
     return (
       <div>
         <div onClick={() => this.props.changeScreen(ScreenEnum.CREATE, "")}>
-          Create new game.
+          # Create new game.
         </div>
         <div onClick={() => this.props.changeScreen(ScreenEnum.FIND, "")}>
-          Find a game.
+          # Find a game.
         </div>
       </div>
     )
@@ -95,7 +95,7 @@ class CreateScreen extends React.Component {
           'Content-Type': 'application/json'
       }
     }
-    fetch("http://127.0.0.1:8000/game", options)
+    fetch("http://94.245.90.7/game", options)
       .then(res => res.json())
       .then(
         res => {
@@ -128,10 +128,10 @@ class CreateScreen extends React.Component {
         <CreateOption name={max_name} cnt={max_cnt} 
         cntDwn={() => cntDwn("max_tries")} cntUp={() => cntUp("max_tries")}/>
         <div onClick={this.createGame}>
-          Create the game!
+          # Create the game!
         </div>
         <div onClick={() => this.props.changeScreen(ScreenEnum.FIND, "")}>
-          Find existing game.
+          # Find an existing game.
         </div>
       </div>
     )
@@ -148,14 +148,11 @@ class CreateOption extends React.Component {
     return (
       <div>
         <div>
-          {name}
+          {name}: {count}
         </div>
         <button onClick={counterDown}>
           -
         </button>
-        <div>
-          {count}
-        </div>
         <button onClick={counterUp}>
           +
         </button>
@@ -174,7 +171,7 @@ class FindScreen extends React.Component {
   }
 
   downloadGames = () => {
-    fetch("http://127.0.0.1:8000/game")
+    fetch("http://94.245.90.7/game")
       .then(res => res.json())
       .then(
         res => {
@@ -204,7 +201,7 @@ class FindScreen extends React.Component {
     if (this.state.selectedID) {
       chooseButton = (
         <div onClick={this.chooseGame}>
-          Choose the game!
+          # Choose the game!
         </div>
       )
     }
@@ -222,12 +219,12 @@ class FindScreen extends React.Component {
           })
         }
         <div onClick={this.downloadGames}>
-          Refresh
+          # Refresh
+        </div>
+        <div onClick={() => this.props.changeScreen(ScreenEnum.CREATE, "")}>
+          # Create new game.
         </div>
         {chooseButton}
-        <div onClick={() => this.props.changeScreen(ScreenEnum.CREATE, "")}>
-          Create new game.
-        </div>
       </div>
     )
   }
@@ -241,26 +238,26 @@ class FindRow extends React.Component {
     const max_tries = this.props.data.max_tries
     let selected
     if (this.props.selected) {
-      selected = "selected"
+      selected = "TICK!"
     } else {
-      selected = "not"
+      selected = ""
     }
     return (
       <div onClick={() => this.props.select(gameID)}>
         <div>
-          {gameID}
+          Number of colours: {n_colours}
         </div>
         <div>
-            {n_colours}
+          Number of positions: {n_positions}
         </div>
         <div>
-            {n_positions}
+          Maximal number of tries: {max_tries}
         </div>
         <div>
-            {max_tries}
+          Selected: {selected}
         </div>
         <div>
-            {selected}
+          ====================================
         </div>
       </div>
     )
@@ -293,7 +290,7 @@ class PlayScreen extends React.Component {
   }
 
   downloadData = () => {
-    fetch(`http://127.0.0.1:8000/game/${this.props.gameID}`)
+    fetch(`http://94.245.90.7/game/${this.props.gameID}`)
       .then(res => res.json())
       .then(
         res => {
@@ -328,7 +325,7 @@ class PlayScreen extends React.Component {
           'Content-Type': 'application/json'
       }
     }
-    fetch(`http://127.0.0.1:8000/game/${this.props.gameID}`, options)
+    fetch(`http://94.245.90.7/game/${this.props.gameID}`, options)
       .then(res => res.json())
       .then(
         res => {
@@ -388,10 +385,10 @@ class PlayScreen extends React.Component {
           onPinClick={(i) => this.changePinValue(i)}
         />
         <div onClick={() => this.props.changeScreen(ScreenEnum.CREATE, "")}>
-          Create new game.
+          # Create new game.
         </div>
         <div onClick={() => this.props.changeScreen(ScreenEnum.FIND, "")}>
-          Find a game.
+          # Find a game.
         </div>
       </div>
     )
@@ -406,6 +403,9 @@ class HistoryRow extends React.Component {
       <div>
         <HistorySequence sequence={sequence}/>
         <HistoryHint hint={hint}/>
+        <div>
+          ====================================
+        </div>
       </div>
     )
   }
