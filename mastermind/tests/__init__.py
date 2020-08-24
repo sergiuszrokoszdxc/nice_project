@@ -1,0 +1,1 @@
+# TODO sprawdzic czy bez testów zainstalowana paczka bedzie mniejsza

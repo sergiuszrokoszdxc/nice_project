@@ -1,41 +1,24 @@
 version: "3.7"
 services:
 
-  nice_project:
-    image: nice_project
-    build: ./nice_project
+  mastermind:
+    image: mastermind
+    build: ./mastermind
     environment:
-      NICE_PROJECT_PORT: ${NICE_PROJECT_PORT}
+      MODULE_NAME: "mastermind.main"
     networks:
       - network
-    command:
-      - uwsgi
-      - wsgi.ini
 
-  nginx:
-    image: nginx
+  frontend:
+    image: front_end
     build: 
-      context: ./nginx
+      context: ./front_end/front_end
     depends_on:
-        - nice_project
-    environment:
-      NICE_PROJECT_HOST: nice_project
-      NICE_PROJECT_PORT: ${NICE_PROJECT_PORT}
-      NGINX_LISTEN_PORT: ${NGINX_LISTEN_PORT}
+        - mastermind
     expose:
-      - ${NGINX_LISTEN_PORT}
+      - 80
     ports:
-      - ${SERVICE_PORT}:${NGINX_LISTEN_PORT}
-    networks:
-      - network
-
-  acceptance_tests:
-    build: ./acceptance_tests
-    depends_on:
-      - nginx
-    environment: 
-      NGINX_HOST: nginx
-      NGINX_PORT: "${NGINX_LISTEN_PORT}"
+      - 80:80
     networks:
       - network
 
