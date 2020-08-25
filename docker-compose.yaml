@@ -17,6 +17,7 @@ services:
     build: ./mastermind
     depends_on:
       - traefik
+      - mongo
     environment:
       MODULE_NAME: "mastermind.main"
       MAX_WORKERS: 1
@@ -39,6 +40,12 @@ services:
       - "traefik.http.routers.front_end.rule=PathPrefix(`/`)"
     networks:
       - network
+  
+  mongo:
+    image: mongo
+    networks:
+      - network
+  # TODO: create second user for security
 
 networks:
   network:

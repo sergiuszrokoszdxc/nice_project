@@ -1,105 +1,37 @@
-import asyncio
-import hashlib
+from datetime import datetime, timedelta
 from typing import List
 
 from fastapi import FastAPI
-from pydantic import BaseModel
 
-from mastermind.mastermind import Mastermind, MaxTriesExceeded
+from mastermind.game_provider import GameProvider
+from mastermind.models import GameDetailOut, GameBase, GameToList, Guess
 
-# TODO: MAKE IT SO IT IS AVAILABLE ONLY LIMITED AMOUNT OF TIME
-# TODO: timing
-# TODO: garbage_collect old games
-# TODO: unique id for any game disregarding parameters
-# TODO:
+# TODO: add validation
+    # TODO: websockets
+    # TODO: add pagination
 
 app = FastAPI()
 
-games = dict()
+games = GameProvider()
 
-class Game(BaseModel):
-    n_colours: int
-    n_positions: int
-    max_tries: int
-
-class GameOut(BaseModel):
-    id_: str
-    n_colours: int
-    n_positions: int
-    max_tries: int
-    has_ended: bool
-
-
-@app.get("/game", response_model=List[GameOut])
+@app.get("/game", response_model=List[GameToList])
 async def get_game():
-    # websockets
-    # add pagination
-    global games
-    games_list = [
-        {
-            "id_": id_,
-            "n_colours": game.n_colours,
-            "n_positions": game.n_positions,
-            "max_tries": game.max_tries,
-            "has_ended": has_ended
-        }
-        for id_, (game, has_ended) in games.items()
-    ]
+    games_list = await games.get_all()
     return games_list
 
-@app.post("/game", response_model=GameOut)
-async def post_game(game: Game):
-    global games
-    id_ = hashlib.sha1(game.json(sort_keys=True).encode()).hexdigest()
-    m = Mastermind(**game.dict())
-    games[id_] = [m, False]
-    game_out = dict(id_=id_, has_ended=False, **game.dict())
+@app.post("/game", response_model=GameToList)
+async def post_game(game: GameBase):
+    expires_at = datetime.now() + timedelta("30 min")
+    game_in = game.dict()
+    game_out = games.create_game(**game_in, expires_at=expires_at)
     return game_out
 
-@app.get("/game/{game_id}")
+@app.get("/game/{game_id}", response_model=GameDetailOut)
 async def get_guess(game_id: str):
-    global games
-    game, has_ended = games[game_id]
-    history = game.past_sequences
-    return {
-        # poprawić TODO:
-        "n_colours": game.n_colours,
-        "n_positions": game.n_positions,
-        "max_tries": game.max_tries,
-        "has_ended": has_ended,
-        "history": history,
-        "win_token": False
-        }
-       
+    game = games.get_game_by_id(game_id)
+    return game
 
-@app.post("/game/{game_id}")
-async def post_guess(game_id: str, guess: List[int]):
-    global games
-    game, has_ended = games[game_id]
-    if not has_ended:
-        try:
-            hint = game.guess(guess)
-        except MaxTriesExceeded:
-            win_token = False
-            has_ended = True
-        else:
-            if hint[1] == 0 and hint[0] == game.n_positions:
-                win_token = True
-                has_ended = True
-                games[game_id] = game, has_ended
-            else:
-                win_token = False
-                if game.tries_left == 0:
-                    has_ended = True
-                    games[game_id] = game, has_ended
-    else:
-        win_token = False
-    history = game.past_sequences
-    return {
-        "n_colours": game.n_colours,
-        "n_positions": game.n_positions,
-        "max_tries": game.max_tries,
-        "has_ended": has_ended,
-        "history": history,
-        "win_token": win_token
-    }
+@app.post("/game/{game_id}", response_model=GameDetailOut)
+async def post_guess(game_id: str, guess: Guess):
+    game_dict = games.guess(game_id, guess["guess"])
+    return game_dict

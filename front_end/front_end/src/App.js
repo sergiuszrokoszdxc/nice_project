@@ -283,7 +283,7 @@ class PlayScreen extends React.Component {
 
   getInitialGuess = (history, n_positions) => {
     if (history.length > 0) {
-      return history[history.length - 1][0]
+      return history[history.length - 1].guess
     } else {
       return Array.from(Array(n_positions), () => 0)
     }
@@ -397,8 +397,8 @@ class PlayScreen extends React.Component {
 
 class HistoryRow extends React.Component {
   render () {
-    const sequence = this.props.history[0]
-    const hint = this.props.history[1]
+    const sequence = this.props.history.guess
+    const hint = this.props.history.hint
     return (
       <div>
         <HistorySequence sequence={sequence}/>

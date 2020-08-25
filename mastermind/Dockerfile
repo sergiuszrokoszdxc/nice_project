@@ -1,5 +1,7 @@
 FROM tiangolo/uvicorn-gunicorn-fastapi:python3.8-alpine3.10
 
-RUN cat prestart.sh
+COPY requirements.txt .
+
+RUN python3 -m pip install -r requirements.txt
 
 COPY ./mastermind mastermind
