@@ -37,7 +37,6 @@ spec:
             configMapKeyRef:
               name: nginx-config
               key: NGINX_LISTEN_PORT
-
 ---
 
 apiVersion: v1
