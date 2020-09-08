@@ -2,9 +2,12 @@ apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
 metadata:
   name: traefik
-  namespace: default
+  namespace: kube-system
 spec:
   chart:
-    git: https://containous.github.io/traefik-helm-chart
-    ref: master
-    path: traefik
+    repository: https://kubernetes-charts.storage.googleapis.com
+    name: traefik
+    version: 1.87.2
+  values:
+    dashboard:
+      enabled: true
