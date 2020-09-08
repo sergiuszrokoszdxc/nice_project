@@ -8,8 +8,8 @@ from fastapi.logger import logger
 import motor.motor_asyncio
 
 # TODO: turn into BaseSetting from Pydantic
-MONGO_HOST = os.environ.get("MONGO_HOST")
-MONGO_PORT = int(os.environ.get("MONGO_PORT"))
+MONGO_HOST = os.environ.get("MONGO_HOST", "mongo")
+MONGO_PORT = int(os.environ.get("MONGO_PORT", 27017))
 
 client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_HOST, MONGO_PORT)
 
