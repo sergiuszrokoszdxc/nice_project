@@ -25,7 +25,7 @@ FROM build as test
 
 RUN python3 -m pip install pytest pytest-asyncio
 
-FROM python:3.8.3-alpine3.11 as deployment
+FROM python:3.8.3-alpine3.11 as release
 
 RUN python3 -m pip install --upgrade pip \
   && python3 -m pip install wheel
@@ -37,8 +37,6 @@ COPY --from=build /wheel /wheel
 RUN python3 -m pip install --no-index --find-links=/wheel /wheel/*.whl
 
 COPY entrypoint.sh entrypoint.sh
-
-RUN sed -i 's/\r$//' entrypoint.sh
 
 RUN chmod +x entrypoint.sh
 
