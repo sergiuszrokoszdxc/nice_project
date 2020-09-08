@@ -11,4 +11,4 @@ spec:
   values:
     dashboard:
       enabled: true
-      domain: dashboard.51.104.142.0.nip.io
+      domain: dashboard.20.54.48.95.nip.io
