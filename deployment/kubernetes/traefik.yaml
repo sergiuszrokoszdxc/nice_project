@@ -2,7 +2,7 @@ apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
 metadata:
   name: traefik
-  namespace: niceproject
+  namespace: default
 spec:
   chart:
     git: https://containous.github.io/traefik-helm-chart
