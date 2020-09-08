@@ -1,28 +1,38 @@
 from datetime import datetime, timedelta
 from typing import List, Tuple
 
-from pydantic import BaseModel
+from pydantic import BaseModel, conint, validator
 
-class GameBase(BaseModel):
-    n_colours: int
-    n_positions: int
-    max_tries: int
+PosInt = conint(ge=1, strict=True)
+NonNegInt = conint(ge=0, strict=True)
+
+class MastermindBaseSpec(BaseModel):
+    n_colours: PosInt
+    n_positions: PosInt
+    max_tries: PosInt
 
 class Guess(BaseModel):
-    guess: Tuple[int]
+    guess: Tuple[NonNegInt, ...]
 
-class Result(BaseModel):
-    guess: Guess
-    hint: tuple
+class GuessHint(Guess):
+    hint: Tuple[NonNegInt, NonNegInt]
 
-class GameToList(GameBase):
-    _id: str
+class MastermindDBIn(MastermindBaseSpec):
+    id_: str = None
+    sequence: Tuple[NonNegInt, ...]
+    expires_at: datetime
+    history: List[GuessHint] = []
+    class Config:
+        orm_mode = True
+
+class MastermindSumm(MastermindBaseSpec):
+    id_: str
     tries_left: int
     time_left: timedelta
     has_ended: bool
 
-class GameDetail(GameToList):
-    past_results: List[Result]
+class MastermindDetail(MastermindSumm):
+    history: List[GuessHint]
 
-class GameDetailOut(GameDetail):
+class MastermindResult(MastermindDetail):
     win_token: bool

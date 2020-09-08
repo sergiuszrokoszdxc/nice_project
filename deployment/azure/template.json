@@ -2,73 +2,64 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "tag": {
-            "type": "string"
+        "ClusterName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of a cluster"
+            }
         },
-        "publicPort": {
-            "type": "string"
+        "NodeCount": {
+            "type": "int",
+            "metadata": {
+                "description": "Count of nodes"
+            }
+        },
+        "AdminUsername": {
+            "type": "string",
+            "metadata": {
+                "description": "The administrator username to use for Linux VMs"
+            }
+        },
+        "AdminPublicKey": {
+            "type": "string",
+            "metadata": {
+                "description": "Public key used to authenticate with VMs through SSH"
+            }
         }
     },
     "functions": [],
     "variables": {},
     "resources": [
         {
-            "name": "app-container",
-            "type": "Microsoft.ContainerInstance/containerGroups",
-            "apiVersion": "2018-10-01",
+            "name": "[parameters('ClusterName')]",
+            "type": "Microsoft.ContainerService/managedClusters",
+            "apiVersion": "2020-02-01",
             "location": "[resourceGroup().location]",
             "properties": {
-                "containers": [
+                "kubernetesVersion": "1.16.13",
+                "dnsPrefix": "dnsprefix",
+                "agentPoolProfiles": [
                     {
-                        "name": "app",
-                        "properties": {
-                            "image": "[concat('sergiuszrokoszdxc/nice_project_nice_project:', parameters('tag'))]",
-                            "ports": [
-                                {
-                                    "port": "[parameters('publicPort')]"
-                                }
-                            ],
-                            "resources": {
-                                "requests": {
-                                    "cpu": 1,
-                                    "memoryInGB": 3
-                                }
-                            },
-                            "environmentVariables": [
-                                {
-                                    "name": "FLASK_APP",
-                                    "value": "nice_project.app:flask_app"
-                                },
-                                {
-                                    "name": "NICE_PROJECT_PORT",
-                                    "value": "[parameters('publicPort')]"
-                                },
-                                {
-                                    "name": "FLASK_ENV",
-                                    "value": "developement"
-                                }
-                                
-                            ],
-                            "command":  [
-                                "flask",
-                                "run",
-                                "-h",
-                                "0.0.0.0"
-                            ]
-                        }
+                        "name": "agentpool",
+                        "count": "[parameters('NodeCount')]",
+                        "vmSize": "Standard_B2s",
+                        "osType": "Linux",
+                        "storageProfile": "ManagedDisks"
                     }
                 ],
-                "osType": "Linux",
-                "restartPolicy": "OnFailure",
-                "ipAddress": {
-                    "type": "Public",
-                    "ports": [
-                        {
-                            "protocol": "TCP",
-                            "port": "[parameters('publicPort')]"
-                        }
-                    ]
+                "linuxProfile": {
+                    "adminUsername": "[parameters('AdminUsername')]",
+                    "ssh": {
+                        "publicKeys": [
+                            {
+                                "keyData": "[parameters('AdminPublicKey')]"
+                            }
+                        ]
+                    }
                 }
+            },
+            "identity": {
+                "type": "SystemAssigned"
             }
         }
     ],

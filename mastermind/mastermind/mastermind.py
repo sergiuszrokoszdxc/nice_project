@@ -1,84 +1,86 @@
 from collections import Counter
 from datetime import datetime, timedelta
 from itertools import compress
+from random import choices
 from typing import Tuple
 
-from mastermind.mongo_backend import Memory
+from fastapi.logger import logger
 
-class GameEnding(BaseException):
-    """The game is going to stop."""
+from mastermind.game import Timed, TriesLimited
+from mastermind.models import MastermindDBIn
+from mastermind.mongo_backend import update_game
 
-class MaxTriesExceeded(GameEnding):
-    """Max number of tries exceeded for this game."""
+class Mastermind(Timed, TriesLimited):
 
-class CorrectSequence(GameEnding):
-    """The game is ending as correct sequence was supplied."""
+    db_model = MastermindDBIn
 
-class Mastermind:
-
-    def __init__(
-        self,
-        n_colours: int,
-        max_tries: int,
-        expires_at: datetime,
-        memory: Memory,
-        sequence: Tuple[int],
-    ):
-        self.n_colours = n_colours
-        self.n_positions = len(sequence)
-        self.max_tries = max_tries
-        self.expires_at = expires_at
-        self.memory = memory
-        self.sequence = sequence
+    def __init__(self, **game_base):
+        n_colours = game_base["n_colours"]
+        n_positions = game_base["n_positions"]
+        if "sequence" not in game_base:
+            game_base["sequence"] = choices(range(n_colours), k=n_positions)
+            game_base["history"] = []
+        super().__init__(**game_base)
 
     @property
-    def tries_left(self) -> int:
-        return self.max_tries - self.n_try
+    def n_tries(self) -> int:
+        return len(self.history) # pylint: disable=no-member
 
     @property
-    def n_try(self) -> int:
-        return len(self.memory)
-
-    async def guess(self, sequence: Tuple[int]) -> Tuple[int]:
-        """Try to guess the sequence."""
-        if self.tries_left:
-            hint = self._guess(sequence)
-            result = {"guess": sequence, "hint": hint}
-            await self._save_guess_result(result)
-            if hint[0] == self.n_positions:
-                raise CorrectSequence
-            return hint
+    def has_ended(self):
+        try:
+            last = self.history[-1] # pylint: disable=no-member
+        except IndexError:
+            won = False
         else:
-            raise MaxTriesExceeded
+            hint = last["hint"]
+            won = self._if_win(hint)
+        return bool(not (self.max_tries - self.n_tries > 0) or won)
+    
+    def _if_win(self, hint):
+        return hint[0] == self.n_positions # pylint: disable=no-member
+
+    async def play(self, input_: Tuple[int]) -> bool:
+        """Try to guess the sequence."""
+        if not self.has_ended:
+            hint = self._guess(input_)
+            result = {"guess": input_, "hint": hint}
+            await self._save_guess_result(result)
+            if self._if_win(hint):
+                win = True
+                time_offset = datetime.now() + timedelta(minutes=3)
+                try:
+                    id_ = self.id_
+                except AttributeError:
+                    logger.debug(f"{self} not yet saved in database.")
+                else:
+                    self.schedule_deletion(id_, time_offset) # pylint: disable=no-member
+            else:
+                win = False
+        else:
+            win = False
+        return win
 
     def _guess(self, proposed_sequence: Tuple[int]) -> Tuple[int]:
         correct_mask = tuple(
             x == y
-            for x, y in zip(proposed_sequence, self.sequence)
+            for x, y in zip(proposed_sequence, self.sequence) # pylint: disable=no-member
             )
         wrong_mask = tuple(not x for x in correct_mask)
         n_correct_pos = sum(correct_mask)
         # count unmatched pins by colour in both sequences
         wrong_pins = Counter(compress(proposed_sequence, wrong_mask))
-        umatched_pins = Counter(compress(self.sequence, wrong_mask))
+        umatched_pins = Counter(compress(self.sequence, wrong_mask)) # pylint: disable=no-member
         # in leftover pins check how many pins are matched by colour
         # between both groups
         correct_colours_by_colour = (
             min(count, wrong_pins.get(colour, 0))
             for colour, count in umatched_pins.items()
             )
-        n_correct_col = sum(correct_colours_by_colour)
-
-        assert n_correct_pos + n_correct_col == self.n_positions
+        n_correct_col = sum(correct_colours_by_colour)\
 
         return n_correct_pos, n_correct_col
 
-    async def _save_guess_result(self, result: Tuple[int]) -> None:
-        await self.memory.append(
-            result,
-            self.n_colours,
-            self.n_positions,
-            self.max_tries,
-            self.expires_at,
-            self.sequence
-            )
+    async def _save_guess_result(self, result: dict) -> None:
+        self.history.append(result) # pylint: disable=no-member
+        await update_game(self.serialize())

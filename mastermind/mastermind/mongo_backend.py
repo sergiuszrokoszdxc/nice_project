@@ -1,73 +1,54 @@
 import asyncio
 from datetime import datetime
-from typing import Tuple
+import logging
+import os
 
+from bson.objectid import ObjectId
+from fastapi.logger import logger
 import motor.motor_asyncio
 
-client = motor.motor_asyncio.AsyncIOMotorClient("mongo", 27017)
+# TODO: turn into BaseSetting from Pydantic
+MONGO_HOST = os.environ.get("MONGO_HOST")
+MONGO_PORT = int(os.environ.get("MONGO_PORT"))
+
+client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_HOST, MONGO_PORT)
 
 backend = client["app_database"]
 
-games = backend["games_collection"]
-# TODO: add logging
+games_collection = backend["games_collection"]
 
-async def create_game_doc(
-    n_colours: int,
-    sequence: Tuple[int],
-    max_tries: int,
-    expires_at: datetime
-) -> dict:
-    document = {
-        "n_colours": n_colours,
-        "n_positions": len(sequence),
-        "max_tries": max_tries,
-        "expires_at": expires_at,
-        "sequence": sequence,
-        "history": []
-    }
-    result = await games.insert_one(document)
-    document["_id"] = result.inserted_id
-    return document
+async def save_game(game_in: dict) -> dict:
+    result = await games_collection.insert_one(game_in)
+    game_out = dict(game_in)
+    game_out["id_"] = str(result.inserted_id)
+    logger.info(f"Saved: {game_out}.")
+    return game_out
 
-def get_game_cursor(query):
-    cursor = games.find(query)
-    return cursor
+async def update_game(game_in: dict) -> None:
+    _id = ObjectId(game_in["id_"])
+    await games_collection.replace_one({"_id": _id}, game_in)
+    logger.info(f"Updated: {game_in}.")
 
-async def retrieve_game_by_id(_id: str) -> dict:
-    game = await games.find_one({"_id": _id})
-    return game
+async def schedule_deletion(id_: str, when: datetime) -> None:
+    postpone_timedelta = when - datetime.now()
+    logger.debug(
+        f"Scheduled for deletion in {postpone_timedelta.total_seconds()} seconds id: {id_}."
+        )
+    await asyncio.sleep(postpone_timedelta.total_seconds())
+    _id = ObjectId(id_)
+    await games_collection.delete_one({"_id": _id})
+    logger.info(f"Deleted id: {id_}.")
 
-async def postpone_deletion(_id: str, expires_at: datetime) -> None:
-    postpone_timedelta = expires_at - datetime.now()
-    asyncio.sleep(postpone_timedelta)
-    await games.delete_one({"_id": _id})
+async def get_game_by_id(id_: str) -> dict:
+    _id = ObjectId(id_)
+    game_out = await games_collection.find_one({"_id": _id})
+    logger.info(f"Found: {game_out}.")
+    game_out["id_"] = id_
+    return game_out
 
-
-class Memory:
-    def __init__(self, _id, memory):
-        self.memory = memory
-        self._id = _id
-
-    def __len__(self) -> int:
-        return len(self.memory)
-    
-    async def append(
-        self,
-        result: tuple,
-        n_colours: int,
-        n_positions :int,
-        max_tries: int,
-        expires_at : datetime,
-        sequence: Tuple[int]
-    ) -> None:
-        self.memory.append(result)
-        new_document = {
-            "n_colours": n_colours,
-            "n_positions": n_positions,
-            "max_tries": max_tries,
-            "expires_at": expires_at,
-            "sequence": sequence,
-            "history": self.memory
-        }
-        result = await games.replace_one({"_id": self._id}, new_document)
-        assert result.modified_count == 1
+async def get_game_cursor(query):
+    cursor = games_collection.find(query)
+    async for game in cursor:
+        logger.info(f"Found: {game}.")
+        game["id_"] = str(game["_id"])
+        yield game

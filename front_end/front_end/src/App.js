@@ -95,7 +95,7 @@ class CreateScreen extends React.Component {
           'Content-Type': 'application/json'
       }
     }
-    fetch("http://94.245.90.7/game", options)
+    fetch("http://localhost/game", options)
       .then(res => res.json())
       .then(
         res => {
@@ -171,7 +171,7 @@ class FindScreen extends React.Component {
   }
 
   downloadGames = () => {
-    fetch("http://94.245.90.7/game")
+    fetch("http://localhost/game")
       .then(res => res.json())
       .then(
         res => {
@@ -290,7 +290,7 @@ class PlayScreen extends React.Component {
   }
 
   downloadData = () => {
-    fetch(`http://94.245.90.7/game/${this.props.gameID}`)
+    fetch(`http://localhost/game/${this.props.gameID}`)
       .then(res => res.json())
       .then(
         res => {
@@ -320,12 +320,12 @@ class PlayScreen extends React.Component {
   sendGuess = () => {
     const options = {
       method: "POST",
-      body: JSON.stringify(this.state.guess),
+      body: JSON.stringify({guess: this.state.guess}),
       headers: {
           'Content-Type': 'application/json'
       }
     }
-    fetch(`http://94.245.90.7/game/${this.props.gameID}`, options)
+    fetch(`http://localhost/game/${this.props.gameID}`, options)
       .then(res => res.json())
       .then(
         res => {

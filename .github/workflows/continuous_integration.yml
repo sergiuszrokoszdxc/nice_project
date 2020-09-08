@@ -7,59 +7,40 @@ on:
 
 jobs:
   Test_and_build:
-    strategy:
-      matrix:
-        service: [nice_project, nginx]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
         # get tests log out
       - name: Installing dependencies for test and build phase
-        run: docker build --tag nice_project_tests --target build  nice_project
+        run: docker build --tag mastermind_test --target test mastermind
       - name: Unit and integration tests of nice_project
-        run: docker run nice_project_tests python -m unittest
-      - name: Building release image
-        run: |
-          docker-compose build
-          docker-compose up -d nginx
-        env:
-          NGINX_LISTEN_PORT: 5002
-          NICE_PROJECT_PORT: 5001
-          SERVICE_PORT: 5000
-      - name: Acceptance tests
-        run: docker-compose up acceptance_tests
-        env:
-          NGINX_LISTEN_PORT: 5002
-          NICE_PROJECT_PORT: 5001
-          SERVICE_PORT: 5000
-      - name: Tear down docker-compose
-        run: docker-compose down
-      - name: Tagging realease image
-        run: |
-          docker tag ${{ matrix.service }} "${DOCKER_USER}/nice_project_${{ matrix.service }}:latest"
-          SHORT_SHA="${GITHUB_SHA:0:7}"
-          echo "::set-env name=SHORT_SHA::${SHORT_SHA}"
-          docker tag ${{ matrix.service }} "${DOCKER_USER}/nice_project_${{ matrix.service }}:${SHORT_SHA}"
-      - name: Tagging image with a release tag
-        if: ${{ github.event_name == 'release' }}
-        run: |
-          TAG="${GITHUB_REF##*/}"
-          echo "::set-env name=TAG::${TAG}"
-          docker tag ${{ matrix.service }} ${DOCKER_USER}/nice_project_${{ matrix.service }}:${TAG}
+        run: docker run mastermind_test python -m pytest
+        # TODO: test frontend
+      - name: Build release image for mastermind
+      run: docker build --tag mastermind_release --target release mastermind
+      - name: Build release image for frontend
+      run: docker build --tag frontend_release --target release frontend
+      # TODO: add acceptance tests
+      - name: Tag release images
+      run: |
+        SHORT_SHA="${GITHUB_SHA:0:7}"
+        echo "::set-env name=SHORT_SHA::${SHORT_SHA}"
+        docker tag mastermind_release ${DOCKER_USER}/nice_project_mastermind:latest
+        docker tag mastermind_release ${DOCKER_USER}/nice_project_mastermind:${SHORT_SHA}
+        docker tag frontend_release ${DOCKER_USER}/nice_project_frontend:latest
+        docker tag frontend_release ${DOCKER_USER}/nice_project_frontend:${SHORT_SHA}
       - name: Loging into dockerhub
         run: 
           echo "$DOCKER_PASSWORD" | docker login -u "${DOCKER_USER}" --password-stdin
-      - name: Pushing images
+      - name: Push release images
         run: |
-          docker push ${DOCKER_USER}/nice_project_${{ matrix.service }}:latest
-          docker push ${DOCKER_USER}/nice_project_${{ matrix.service }}:${SHORT_SHA}
-      - name: Pushing image with a release tag
-        if: ${{ github.event_name == 'release' }}
-        run: docker push ${DOCKER_USER}/nice_project_${{ matrix.service }}:${TAG}
+          docker push ${DOCKER_USER}/nice_project_mastermind:latest
+          docker push ${DOCKER_USER}/nice_project_frontend:latest
+          docker push ${DOCKER_USER}/nice_project_mastermind:${SHORT_SHA}
+          docker push ${DOCKER_USER}/nice_project_frontend:${SHORT_SHA}
       - name: Logint out of dockerhub
         run: docker logout
     env:
       DOCKER_USER: ${{ secrets.DOCKERHUB_ACCOUNT_NAME }}
       DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
-

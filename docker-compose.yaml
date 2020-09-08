@@ -3,7 +3,8 @@ services:
 
   traefik:
     image: traefik
-    command: --api.insecure=true --providers.docker --providers.docker.exposedByDefault=false
+    depends_on:
+      - frontend
     ports:
       - "80:80"
       - "8080:8080"
@@ -11,23 +12,27 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - network
+    command: --api.insecure=true --providers.docker --providers.docker.exposedByDefault=false
 
   mastermind:
     image: mastermind
     build: ./mastermind
     depends_on:
-      - traefik
       - mongo
     environment:
-      MODULE_NAME: "mastermind.main"
-      MAX_WORKERS: 1
+      MONGO_HOST: "mongo"
+      MONGO_PORT: 27017
     labels:
       - "traefik.enable=true"
       - "traefik.backend=mastermind"
       - "traefik.http.routers.mastermind.rule=PathPrefix(`/game`)"
     networks:
       - network
-# TODO: database backend i max_workers > 1
+    expose:
+      - "80"
+    command:
+      gunicorn -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:80 mastermind.main:app
+
   frontend:
     image: front_end
     build: 
