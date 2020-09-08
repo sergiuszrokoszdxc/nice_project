@@ -1,0 +1,14 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: traefik
+  namespace: kube-system
+spec:
+  chart:
+    repository: https://kubernetes-charts.storage.googleapis.com
+    name: traefik
+    version: 1.87.2
+  values:
+    dashboard:
+      enabled: true
+      domain: dashboard.51.104.142.0.nip.io

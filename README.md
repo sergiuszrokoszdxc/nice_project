@@ -25,7 +25,7 @@ GIT_URL=git@github.com:sergiuszrokoszdxc/nice_project.git
 
 kubectl create namespace flux
 
-helm upgrade -i flux fluxcd/flux --set git.url=$GIT_URL --set git.path=deployment --namespace flux
+helm upgrade -i flux fluxcd/flux --set git.url=$GIT_URL --set git.path=deployment --set syncGarbageCollection.enabled=true --namespace flux
 
 helm upgrade -i helm-operator fluxcd/helm-operator --set git.ssh.secretName=flux-git-deploy --set helm.versions=v3 --namespace flux
 `
