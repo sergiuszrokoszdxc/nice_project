@@ -1,43 +1,56 @@
-version: "3.7"
+version: "3.3"
 services:
 
-  nice_project:
-    image: nice_project
-    build: ./nice_project
-    environment:
-      NICE_PROJECT_PORT: ${NICE_PROJECT_PORT}
-    networks:
-      - network
-    command:
-      - uwsgi
-      - wsgi.ini
-
-  nginx:
-    image: nginx
-    build: 
-      context: ./nginx
+  traefik:
+    image: traefik
     depends_on:
-        - nice_project
-    environment:
-      NICE_PROJECT_HOST: nice_project
-      NICE_PROJECT_PORT: ${NICE_PROJECT_PORT}
-      NGINX_LISTEN_PORT: ${NGINX_LISTEN_PORT}
-    expose:
-      - ${NGINX_LISTEN_PORT}
+      - frontend
     ports:
-      - ${SERVICE_PORT}:${NGINX_LISTEN_PORT}
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - network
+    command: --api.insecure=true --providers.docker --providers.docker.exposedByDefault=false
 
-  acceptance_tests:
-    build: ./acceptance_tests
+  mastermind:
+    image: mastermind
+    build: ./mastermind
     depends_on:
-      - nginx
-    environment: 
-      NGINX_HOST: nginx
-      NGINX_PORT: "${NGINX_LISTEN_PORT}"
+      - mongo
+    environment:
+      MONGO_HOST: "mongo"
+      MONGO_PORT: 27017
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=mastermind"
+      - "traefik.http.routers.mastermind.rule=PathPrefix(`/game`)"
     networks:
       - network
+    expose:
+      - "80"
+    command:
+      gunicorn -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:80 mastermind.main:app
+
+  frontend:
+    image: front_end
+    build: 
+      context: ./front_end/front_end
+    depends_on:
+        - mastermind
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=front_end"
+      - "traefik.http.routers.front_end.rule=PathPrefix(`/`)"
+    networks:
+      - network
+  
+  mongo:
+    image: mongo
+    networks:
+      - network
+  # TODO: create second user for security
 
 networks:
   network:

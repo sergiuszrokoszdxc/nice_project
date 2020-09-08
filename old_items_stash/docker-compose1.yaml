@@ -1,0 +1,44 @@
+version: "3.7"
+services:
+
+  nice_project:
+    image: nice_project
+    build: ./nice_project
+    environment:
+      NICE_PROJECT_PORT: ${NICE_PROJECT_PORT}
+    networks:
+      - network
+    command:
+      - uwsgi
+      - wsgi.ini
+
+  nginx:
+    image: nginx
+    build: 
+      context: ./nginx
+    depends_on:
+        - nice_project
+    environment:
+      NICE_PROJECT_HOST: nice_project
+      NICE_PROJECT_PORT: ${NICE_PROJECT_PORT}
+      NGINX_LISTEN_PORT: ${NGINX_LISTEN_PORT}
+    expose:
+      - ${NGINX_LISTEN_PORT}
+    ports:
+      - ${SERVICE_PORT}:${NGINX_LISTEN_PORT}
+    networks:
+      - network
+
+  acceptance_tests:
+    build: ./acceptance_tests
+    depends_on:
+      - nginx
+    environment: 
+      NGINX_HOST: nginx
+      NGINX_PORT: "${NGINX_LISTEN_PORT}"
+    networks:
+      - network
+
+networks:
+  network:
+    driver: bridge

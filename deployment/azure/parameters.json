@@ -2,11 +2,17 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "tag": {
-            "value": "latest"
+        "ClusterName": {
+            "value": "NiceProjectCluster"
         },
-        "publicPort": {
-            "value": "80"
+        "NodeCount": {
+            "value": 1
+        },
+        "AdminUsername": {
+            "value": "NiceProjectAdmin"
+        },
+        "AdminPublicKey": {
+            "value": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDJSxuyR0AsOmrCbmJoRwL+TNLpLNxVa+KlHzH7m7EaKdygq6MrmnEQ81OAdhpYBANUMOXz9ZQa+bvhcEGc5Zj5UMoOw1wQLVONAE6oIyj55HvfaH15h7oXfmFghAWxljBrA/Pkb43s5+rVl3KP+6M85E193HcYFE4fMNpn2N/+BkE8MsrhgUQfoZUqGdDu0Kzur2mGhDSRzelnN3Yue6mlssBr6tXLvb6lBEPGSEstH2ugloVH4JE7EXY3urlb2yGdkYfjJwdrtbjQavWIDFVN33Z9ewrAGuHoy0duQncGpmpEnJH0Im98kCyjP0//r1NjmVU1LDan4TDJQDbDpedT cscmws\\srokosz@PL-PF1BGHTZ"
         }
     }
 }
