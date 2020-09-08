@@ -1,5 +1,5 @@
 ---
-
+"""
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -47,3 +47,4 @@ data:
   NICE_PROJECT_PORT: "5001" # TODO: configuration variable
   NICE_PROJECT_HOST: "nice-project-service" # TODO: configuration variable
   NGINX_LISTEN_PORT: "80" # TODO: configuration variable
+"""
