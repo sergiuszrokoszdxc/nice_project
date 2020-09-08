@@ -21,13 +21,13 @@ az aks get-credentials -g GROUP_NAME -n niceprojectcluster
 `
 
 `
-GIT_URL="git@github.com:sergiuszrokoszdxc/nice_project.git"
+GIT_URL=git@github.com:sergiuszrokoszdxc/nice_project.git
 
 kubectl create namespace flux
 
-helm upgrade -i flux fluxcd/flux --set git.url=$GIT_URL --namespace flux
+helm upgrade -i flux fluxcd/flux --set git.url=$GIT_URL --git-path=namespaces,workloads --namespace flux
 
-helm upgrade -i helm-operator fluxcd/helm-operator --set git.ssh.secretName=flux-git-deploy --namespace flux
+helm upgrade -i helm-operator fluxcd/helm-operator --set git.ssh.secretName=flux-git-deploy --set helm.versions=v3 --namespace flux
 `
 
 `
