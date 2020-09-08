@@ -27,7 +27,7 @@ spec:
             configMapKeyRef:
               name: nice-project-config
               key: NICE_PROJECT_PORT
-        command: [ "uwsgi", "wsgi.ini" ]
+        command: ["uwsgi", "wsgi.ini"]
 
 ---
 

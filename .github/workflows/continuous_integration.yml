@@ -18,18 +18,18 @@ jobs:
         run: docker run mastermind_test python -m pytest
         # TODO: test frontend
       - name: Build release image for mastermind
-      run: docker build --tag mastermind_release --target release mastermind
+        run: docker build --tag mastermind_release --target release mastermind
       - name: Build release image for frontend
-      run: docker build --tag frontend_release --target release frontend
+        run: docker build --tag frontend_release --target release frontend
       # TODO: add acceptance tests
       - name: Tag release images
-      run: |
-        SHORT_SHA="${GITHUB_SHA:0:7}"
-        echo "::set-env name=SHORT_SHA::${SHORT_SHA}"
-        docker tag mastermind_release ${DOCKER_USER}/nice_project_mastermind:latest
-        docker tag mastermind_release ${DOCKER_USER}/nice_project_mastermind:${SHORT_SHA}
-        docker tag frontend_release ${DOCKER_USER}/nice_project_frontend:latest
-        docker tag frontend_release ${DOCKER_USER}/nice_project_frontend:${SHORT_SHA}
+        run: |
+          SHORT_SHA="${GITHUB_SHA:0:7}"
+          echo "::set-env name=SHORT_SHA::${SHORT_SHA}"
+          docker tag mastermind_release ${DOCKER_USER}/nice_project_mastermind:latest
+          docker tag mastermind_release ${DOCKER_USER}/nice_project_mastermind:${SHORT_SHA}
+          docker tag frontend_release ${DOCKER_USER}/nice_project_frontend:latest
+          docker tag frontend_release ${DOCKER_USER}/nice_project_frontend:${SHORT_SHA}
       - name: Loging into dockerhub
         run: 
           echo "$DOCKER_PASSWORD" | docker login -u "${DOCKER_USER}" --password-stdin
