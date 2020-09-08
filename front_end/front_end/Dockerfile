@@ -4,7 +4,7 @@ COPY package*.json ./
 RUN npm install
 COPY . .
 RUN npm run build
-FROM node:alpine AS deployment
+FROM node:alpine AS release
 RUN npm install -g serve
 COPY --from=build /usr/src/app/build /build
 EXPOSE 80

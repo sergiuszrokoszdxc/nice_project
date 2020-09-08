@@ -20,7 +20,7 @@ jobs:
       - name: Build release image for mastermind
         run: docker build --tag mastermind_release --target release mastermind
       - name: Build release image for frontend
-        run: docker build --tag frontend_release --target release frontend
+        run: docker build --tag frontend_release --target release front_end
       # TODO: add acceptance tests
       - name: Tag release images
         run: |
