@@ -1,5 +1,4 @@
 ---
-""""
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -37,4 +36,3 @@ metadata:
   name: nice-project-config
 data:
   NICE_PROJECT_PORT: "5001" # TODO: configuration variable
-""""
