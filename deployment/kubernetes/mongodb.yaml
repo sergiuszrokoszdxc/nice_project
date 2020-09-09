@@ -1,0 +1,10 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: mongodb
+  namespace: default
+spec:
+  chart:
+    repository: https://charts.bitnami.com/bitnami
+    name: mongodb
+    version: 7.8.10
