@@ -1,0 +1,17 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: frontend
+  namespace: default
+spec:
+  chart:
+    git: git@github.com:sergiuszrokoszdxc/nice_project.git
+    ref: master
+    path: deployment/kubernetes/microservice
+  values:
+    image:
+      repository: sergiuszrokoszdxc/nice_project_frontend
+      tag: a63831b
+    ingress:
+      enabled: true
+      domain: projextc.52.142.118.156.nip.io
