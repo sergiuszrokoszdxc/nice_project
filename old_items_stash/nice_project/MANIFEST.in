@@ -1,3 +1,0 @@
-include nice_project/templates/*.html
-include nice_project/static/*
-include ./wsgi.ini
