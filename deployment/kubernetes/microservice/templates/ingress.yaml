@@ -1,0 +1,27 @@
+{{- if .Values.ingress.enabled -}}
+apiVersion: v1
+kind: Ingress
+metadata:
+  name: {{ template "microservice.fullname" . }}-ingress
+  labels:
+    app: {{ template "microservice.name" . }}
+    chart: {{ template "microservice.chart" . }}
+    release: {{ .Release.Name | quote }}
+    heritage: {{ .Release.Service | quote }}
+    {{- with .Values.labels }}
+      {{- toYaml . | indent 4 }}
+    {{- end }}
+    {{- with .Values.annotations }}
+  annotations:
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  rules:
+    - host: {{ .Values.ingress.domain | quote }}
+      http:
+        paths:
+          - path: {{ .Values.ingress.path | quote }}
+            backend:
+              serviceName: {{ template "microservice.fullname" . }}-service
+              servicePort: {{ .Values.service.port }}
+{{- end }}
