@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ template "microservice.fullname" . }}-deployment
+  name: {{ template "microservice.fullname" . }}
   labels:
     app: {{ template "microservice.name" . }}
     chart: {{ template "microservice.chart" . }}
