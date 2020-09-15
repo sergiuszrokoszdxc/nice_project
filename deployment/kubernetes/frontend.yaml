@@ -12,6 +12,6 @@ spec:
     image:
       repository: sergiuszrokoszdxc/nice_project_frontend
       tag: a63831b
-    dashboard:
+    ingress:
       enabled: true
       domain: projextc.52.142.118.156.nip.io
