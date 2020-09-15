@@ -11,6 +11,6 @@ spec:
   values:
     dashboard:
       enabled: true
-      domain: dashboard.20.54.48.95.nip.io
+      domain: dashboard.52.142.118.156.nip.io
     rbac:
       enabled: true
