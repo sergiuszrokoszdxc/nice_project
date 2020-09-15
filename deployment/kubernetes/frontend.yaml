@@ -10,8 +10,8 @@ spec:
     path: deployment/kubernetes/microservice
   values:
     image:
-      repository: 
-      tag: 
+      repository: sergiuszrokoszdxc/nice_project_frontend
+      tag: a63831b
     dashboard:
       enabled: true
       domain: projextc.20.54.48.95.nip.io
