@@ -1,0 +1,17 @@
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: mongodb
+  namespace: default
+spec:
+  chart:
+    git: git@github.com:sergiuszrokoszdxc/nice_project.git
+    ref: master
+    path: deployment/kubernetes/microservice
+  values:
+    image:
+      repository: 
+      tag: 
+    dashboard:
+      enabled: true
+      domain: projextc.20.54.48.95.nip.io
